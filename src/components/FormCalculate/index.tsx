@@ -6,6 +6,8 @@ import Button from '../_ui/Button';
 import moment from 'moment';
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import { FormInstance } from 'antd/lib/form';
+import { CardElement } from '@stripe/react-stripe-js';
+
 
 import css from './form-calculate.module.scss';
 
@@ -32,9 +34,8 @@ const languageData = [
 ];
 
 const subjectAreaData = [
-  {value:'Translation', title:<div>Translation <br/><span>(Translation, Editing)</span></div>},
-  {value:'Translation+', title:<div>Translation+<br/><span>(Specialist editing/translating)</span></div>},
-  {value:'Translation++', title:<div>Translation++<br/><span>(Specialist editing/translating/style-review)</span></div>},
+  {value:'Translation', title:'Translation (inkl. Revision)'},
+  {value:'Proofreading', title:'Proofreading'},
 ];
 
 const tProps = {
@@ -56,6 +57,8 @@ const FormCalculate: FC = () => {
   const [isFistStep, setFistStep] = useState(true);
   const [fistStepEmitted, setFistStepEmitted] = useState(false);
   const formRef = React.createRef<FormInstance>();
+  // const stripe = useStripe();
+  // const elements = useElements();
 
   useEffect(() => {
     setIsClient(true)
@@ -65,7 +68,7 @@ const FormCalculate: FC = () => {
     setHasFiles(e && e.length)
   };
 
-  const submit = () => {
+  const submit = async () => {
     if(isFistStep) {
       setFistStepEmitted(true);
       if(hasFiles) {
@@ -75,6 +78,12 @@ const FormCalculate: FC = () => {
       }
     } else {
       formRef.current!.submit();
+      // const {error, paymentMethod} = await stripe.createPaymentMethod({
+      //   type: 'card',
+      //   card: elements.getElement(CardElement),
+      // });
+      //
+      // console.log('[PaymentMethod]', paymentMethod);
     }
   };
 
@@ -87,7 +96,7 @@ const FormCalculate: FC = () => {
           <Text>Service: <Text style={{ color: '#414141'}}>{firstStepData.service}</Text></Text>
           <Text>Language combination: <Text style={{ color: '#414141'}}>{firstStepData.lngFrom}  `{'>'}` {firstStepData.lngTo}</Text></Text>
           <Text>Delivery time: <Text style={{ color: '#414141'}}>{moment(firstStepData.date).format('MMMM Do YYYY, h:mm:ss a')}</Text></Text>
-          <Text style={{ marginBottom: '30px' }}>Price: <Text style={{ color: '#414141'}}>0.0 CHF</Text></Text>
+          <Text style={{ marginBottom: '30px' }}>Price: <Text style={{ color: '#414141'}}>100.0 CHF</Text></Text>
 
           <Text>Our minimum price with 3-to 5-day delivery is CHF 103.32</Text>
         </View>
@@ -107,25 +116,29 @@ const FormCalculate: FC = () => {
 
     <FileUpload handleChange={getFiles} checkError={fistStepEmitted && !hasFiles} />
 
-    <p>Language</p>
-
-    <div className={css.group}>
-      {/*
+    <div className={classNames(css.group, css.groupArrow)}>
+      <div>
+        <p>Source language</p>
+        {/*
           // @ts-ignore */}
-      <TreeSelect value={firstStepData.lngFrom} treeData={languageData} {...tProps}
-                  placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, lngFrom: e})}}
-      />
+        <TreeSelect value={firstStepData.lngFrom} treeData={languageData} {...tProps}
+                    placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, lngFrom: e})}}
+        />
+      </div>
       <span>&#8594;</span>
-      {/*
+      <div>
+        <p>Target language</p>
+        {/*
           // @ts-ignore */}
-      <TreeSelect value={firstStepData.lngTo} treeData={languageData} {...tProps}
-                  placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, lngTo: e})}}
-      />
+        <TreeSelect value={firstStepData.lngTo} treeData={languageData} {...tProps}
+                    placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, lngTo: e})}}
+        />
+      </div>
     </div>
 
     <div className={css.group}>
       <div>
-        <p>Service</p>
+        <p>Choose service</p>
         {/*
           // @ts-ignore */}
         <TreeSelect value={firstStepData.service} treeData={subjectAreaData} {...tProps} treeNodeLabelProp={'value'}
@@ -135,7 +148,7 @@ const FormCalculate: FC = () => {
       <span />
       <div>
         <p>Delivery time</p>
-        <DatePicker showTime showNow={false} defaultValue={firstStepData.date} format="MM/DD HH:mm" allowClear={false}
+        <DatePicker showTime showNow={false} defaultValue={firstStepData.date} format="DD.MM.YY" allowClear={false}
                     onChange={(e) => {seFirstStepData({...firstStepData, date: moment(e)})}}/>
       </div>
     </div>
@@ -199,6 +212,9 @@ const FormCalculate: FC = () => {
         ><Input placeholder="Phone" /></Form.Item>
       </div>
     </div>
+
+    <p>Credit Card</p>
+    <CardElement className={css.card}/>
     <Form.Item name="remember" valuePropName="checked" rules={[{ required: true, message: 'this field is mandatory' }]}>
       <Checkbox>
         accept  <a>Terms & Conditions</a>
@@ -216,7 +232,7 @@ const FormCalculate: FC = () => {
 
       <div className={css.white}>
         <div>
-          <h3>CHF 0.00</h3>
+          <h3>CHF 100.00</h3>
           <p>AI Translation™ + Refinement by <br/>language experts</p>
           <p>Price per line: CHF 1.97 (excl. 7.70% VAT)</p>
         </div>

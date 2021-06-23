@@ -31,6 +31,12 @@
   .group{
     display: flex;
     align-items: center;
+    &.groupArrow{
+      margin-bottom: 15px;
+      >span{
+        margin-top: 34px;
+      }
+    }
     >span{
       color: white;
       font-size: 15px;
@@ -145,5 +151,19 @@
       text-align: right;
       width: 100%;
     }
+  }
+}
+
+.card{
+  background: white;
+  height: 45px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  padding: 4px 11px;
+  >div{
+    width: 100%;
   }
 }

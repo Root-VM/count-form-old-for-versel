@@ -52,6 +52,13 @@ const FileUpload: FC<{handleChange: any, checkError: boolean}> = (props) => {
         }
       </div>
       <Button styleType="grey"> Select file(s)</Button>
+
+      {checkError &&
+        <>
+          <div />
+          <p className={css.errorT}>this field is mandatory</p>
+        </>
+      }
     </div>
 
   );

@@ -1,8 +1,10 @@
 .group{
-  display: flex;
   width: 100%;
   transition: .3s;
   position: relative;
+  display: grid;
+  grid-template-columns: auto 202px;
+  grid-gap: 0px 25px;
   &.error{
     .files{
       background: white;
@@ -69,5 +71,25 @@
   }
   button{
     max-height: 45px;
+  }
+}
+
+.errorT{
+  margin-top: 2px;
+  font-size: 12px;
+  width: fit-content;
+  color: white;
+  border-bottom: 1px solid #eb5757;
+  position: relative;
+  padding-left: 20px;
+  &:before{
+    content: '';
+    background-image: url('/static/img/error.png');
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    background-size: cover;
   }
 }

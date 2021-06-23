@@ -6,10 +6,9 @@ import Button from '../_ui/Button';
 import moment from 'moment';
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import { FormInstance } from 'antd/lib/form';
-import { CardElement } from '@stripe/react-stripe-js';
-
 
 import css from './form-calculate.module.scss';
+import { loadStripe } from '@stripe/stripe-js';
 
 const styles = StyleSheet.create({
   page: {
@@ -44,6 +43,8 @@ const tProps = {
   style: { width: '100%' }
 };
 
+const stripePromise = loadStripe('pk_test_51J5RtSDgcFJAf3LSUWpMGGMJAX5XpjEvdqrtoDpKfiwPvDjJoY91T9Fqw99I7ZY5mWak1uRSJC84XuKn0HNUt4DA00XMtOKbaY');
+
 const FormCalculate: FC = () => {
   const [firstStepData, seFirstStepData] = useState({
     lngFrom: 'French',
@@ -57,8 +58,6 @@ const FormCalculate: FC = () => {
   const [isFistStep, setFistStep] = useState(true);
   const [fistStepEmitted, setFistStepEmitted] = useState(false);
   const formRef = React.createRef<FormInstance>();
-  // const stripe = useStripe();
-  // const elements = useElements();
 
   useEffect(() => {
     setIsClient(true)
@@ -67,6 +66,9 @@ const FormCalculate: FC = () => {
   const getFiles = (e: any) => {
     setHasFiles(e && e.length)
   };
+
+  const [stripeError, setStripeError] = useState<any>();
+  const [loading, setLoading] = useState(false);
 
   const submit = async () => {
     if(isFistStep) {
@@ -78,12 +80,26 @@ const FormCalculate: FC = () => {
       }
     } else {
       formRef.current!.submit();
-      // const {error, paymentMethod} = await stripe.createPaymentMethod({
-      //   type: 'card',
-      //   card: elements.getElement(CardElement),
-      // });
-      //
-      // console.log('[PaymentMethod]', paymentMethod);
+
+      console.log(stripeError, loading);
+      ///////////////
+      setLoading(true);
+      const stripe = await stripePromise;
+
+      // @ts-ignore
+      const {error} = await stripe.redirectToCheckout({
+        lineItems: [{
+          price: 'price_1J5ZdIDgcFJAf3LS8pRiiBL3',
+          quantity: 100
+        }],
+        mode: 'payment',
+        cancelUrl: window.location.origin,
+        successUrl: `${window.location.origin}/some`
+      });
+      if(error) {
+        setLoading(false);
+        setStripeError(error);
+      }
     }
   };
 
@@ -213,8 +229,8 @@ const FormCalculate: FC = () => {
       </div>
     </div>
 
-    <p>Credit Card</p>
-    <CardElement className={css.card}/>
+    {/*<p>Credit Card</p>*/}
+    {/*<CardElement className={css.card}/>*/}
     <Form.Item name="remember" valuePropName="checked" rules={[{ required: true, message: 'this field is mandatory' }]}>
       <Checkbox>
         accept  <a>Terms & Conditions</a>

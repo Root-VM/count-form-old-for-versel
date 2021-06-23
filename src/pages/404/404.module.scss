@@ -1,0 +1,31 @@
+.box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 230px);
+  box-sizing: border-box;
+  align-items: center;
+  img {
+    width: 100px;
+    margin-bottom: 20px;
+    filter: brightness(0) saturate(100%) invert(48%) sepia(4%) saturate(12%) hue-rotate(331deg) brightness(90%)
+      contrast(85%);
+  }
+  p {
+    font-family: var(--font-poppins);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 26px;
+    line-height: 39px;
+    color: var(--color-grey);
+  }
+}
+
+@media (max-width: 1600px) and (min-width: 920px) {
+  .page {
+    min-height: 134vh;
+    section {
+      min-height: calc(100vh + 25px);
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "react", "prettier"],
+    "extends": [
+        "airbnb",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier",
+        "prettier/react",
+        "prettier/@typescript-eslint"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "env": {
+        "es6": true,
+        "browser": true,
+        "jest": true
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "rules": {
+        "import/prefer-default-export": "off",
+        "prettier/prettier": "off",
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".ts", "tsx"] }],
+        "react/jsx-props-no-spreading": "off",
+        "react/react-in-jsx-scope": "off",
+        "react/button-has-type": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/explicit-member-accessibility": "off",
+        "@typescript-eslint/ban-ts-ignore": "off",
+        "react/prop-types": "off",
+        "func-names": "off",
+        "react/no-unescaped-entities": "off",
+        "import/no-unresolved": "off",
+        "import/extensions": "off",
+        "jsx-a11y/anchor-is-valid": "off",
+        "no-param-reassign": "off",
+        "no-return-await": "off",
+        "react/no-array-index-key": "off",
+        "@typescript-eslint/ban-ts-comment": "off"
+    },
+    "overrides": []
+}

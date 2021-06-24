@@ -181,6 +181,18 @@ a {
     background: #00b0dd;
   }
 }
+.ant-checkbox-disabled .ant-checkbox-inner{
+  border-color: #01a6d1!important;
+  &:after{
+    border-color: white!important;
+  }
+}
+//.ant-checkbox-wrapper.ant-checkbox-wrapper-disabled{
+//  cursor: pointer!important;
+//  .ant-checkbox-disabled + span, .ant-checkbox-disabled{
+//    cursor: pointer!important;
+//  }
+//}
 @media (max-width: 719px) {
   //.wrap {
   //  max-width: 100vw;

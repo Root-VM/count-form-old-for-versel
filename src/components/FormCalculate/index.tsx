@@ -57,6 +57,12 @@ const FormCalculate: FC = () => {
   const [isFistStep, setFistStep] = useState(true);
   const [fistStepEmitted, setFistStepEmitted] = useState(false);
   const formRef = React.createRef<FormInstance>();
+  const [checked, setChecked] = useState(false);
+
+  const onCheckboxChange = async (e: any) => {
+    await setChecked(true);
+    console.log(e);
+  };
 
   useEffect(() => {
     setIsClient(true)
@@ -237,8 +243,9 @@ const FormCalculate: FC = () => {
 
     {/*<p>Credit Card</p>*/}
     {/*<CardElement className={css.card}/>*/}
-    <Form.Item name="remember" valuePropName="checked" rules={[{ required: true, message: 'this field is mandatory' }]}>
-      <Checkbox>
+    <Form.Item name="remember" valuePropName="checked"
+               rules={[{ required: true, message: 'this field is mandatory' }]}>
+      <Checkbox disabled={checked} onChange={onCheckboxChange}>
         accept  <a>Terms & Conditions</a>
       </Checkbox>
     </Form.Item>

@@ -1,8 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import FileUpload from './FilesUpload';
 import classNames from 'classnames';
-import { DatePicker, Input, TreeSelect, Form, Checkbox } from 'antd';
-import Button from '../_ui/Button';
+import { DatePicker, Input, TreeSelect, Form, Checkbox, Button } from 'antd';
 import moment from 'moment';
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import { FormInstance } from 'antd/lib/form';
@@ -67,7 +66,6 @@ const FormCalculate: FC = () => {
     setHasFiles(e && e.length)
   };
 
-  const [stripeError, setStripeError] = useState<any>();
   const [loading, setLoading] = useState(false);
 
   const submit = async () => {
@@ -81,25 +79,33 @@ const FormCalculate: FC = () => {
     } else {
       formRef.current!.submit();
 
-      console.log(stripeError, loading);
-      ///////////////
-      setLoading(true);
-      const stripe = await stripePromise;
+      try {
+        const values = await formRef.current!.validateFields();
 
-      // @ts-ignore
-      const {error} = await stripe.redirectToCheckout({
-        lineItems: [{
-          price: 'price_1J5ZdIDgcFJAf3LS8pRiiBL3',
-          quantity: 100
-        }],
-        mode: 'payment',
-        cancelUrl: window.location.origin,
-        successUrl: `${window.location.origin}/some`
-      });
-      if(error) {
-        setLoading(false);
-        setStripeError(error);
+        setLoading(true);
+        const stripe = await stripePromise;
+
+        // @ts-ignore
+        const {error} = await stripe.redirectToCheckout({
+          lineItems: [{
+            price: 'price_1J5ZdIDgcFJAf3LS8pRiiBL3',
+            quantity: 100
+          }],
+          submitType: 'pay',
+          customerEmail: values.email,
+          mode: 'payment',
+          cancelUrl: window.location.origin,
+          successUrl: window.location.origin
+        });
+        if(error) {
+          setLoading(false);
+        }
+
+      } catch (errorInfo) {
+        console.log('Failed:', errorInfo);
+        return false;
       }
+
     }
   };
 
@@ -112,7 +118,7 @@ const FormCalculate: FC = () => {
           <Text>Service: <Text style={{ color: '#414141'}}>{firstStepData.service}</Text></Text>
           <Text>Language combination: <Text style={{ color: '#414141'}}>{firstStepData.lngFrom}  `{'>'}` {firstStepData.lngTo}</Text></Text>
           <Text>Delivery time: <Text style={{ color: '#414141'}}>{moment(firstStepData.date).format('MMMM Do YYYY, h:mm:ss a')}</Text></Text>
-          <Text style={{ marginBottom: '30px' }}>Price: <Text style={{ color: '#414141'}}>100.0 CHF</Text></Text>
+          <Text style={{ marginBottom: '30px' }}>Price: <Text style={{ color: '#414141'}}>197.0 CHF</Text></Text>
 
           <Text>Our minimum price with 3-to 5-day delivery is CHF 103.32</Text>
         </View>
@@ -248,13 +254,13 @@ const FormCalculate: FC = () => {
 
       <div className={css.white}>
         <div>
-          <h3>CHF 100.00</h3>
+          <h3>CHF 197.00</h3>
           <p>AI Translation™ + Refinement by <br/>language experts</p>
           <p>Price per line: CHF 1.97 (excl. 7.70% VAT)</p>
         </div>
 
         <div>
-          <Button styleType="blue" onClick={submit}> {isFistStep ? 'Next step' : 'Place Order'} </Button>
+          <Button type="primary" disabled={loading} onClick={submit}> {isFistStep ? 'Next step' : 'Place Order'} </Button>
           {isClient && !isFistStep && Print()}
         </div>
       </div>

@@ -51,6 +51,7 @@ const FileUpload: FC<{handleChange: any, checkError: boolean}> = (props) => {
           </div> : <p>{checkError ? 'please select file(s) to translate' : 'file(s) not selected'}</p>
         }
       </div>
+
       <Button styleType="grey"> Select file(s)</Button>
 
       {checkError &&

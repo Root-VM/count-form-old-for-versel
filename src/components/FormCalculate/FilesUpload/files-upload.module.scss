@@ -93,3 +93,30 @@
     background-size: cover;
   }
 }
+
+.grey{
+  background: var(--color-grey);
+  &:hover,&:focus{
+    background: #6b7880;
+  }
+}
+
+@media (max-width: 650px) {
+  .group{
+    display: flex;
+    flex-direction: column;
+    .files{
+      margin-bottom: 10px;
+    }
+    button{
+      width: 100%;
+      max-width: 100%;
+    }
+    input{
+      width: 100%;
+      bottom: 0;
+      top: auto;
+      height: 55px;
+    }
+  }
+}

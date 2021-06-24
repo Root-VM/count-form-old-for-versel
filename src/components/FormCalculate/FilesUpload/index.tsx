@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
-import Button from '../../_ui/Button';
 import classNames from 'classnames';
+import { Button } from 'antd';
 
 import css from './files-upload.module.scss';
 
@@ -52,7 +52,7 @@ const FileUpload: FC<{handleChange: any, checkError: boolean}> = (props) => {
         }
       </div>
 
-      <Button styleType="grey"> Select file(s)</Button>
+      <Button type="primary" className={css.grey}>Select file(s)</Button>
 
       {checkError &&
         <>

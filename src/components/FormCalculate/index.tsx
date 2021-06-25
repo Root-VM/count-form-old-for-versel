@@ -1,39 +1,19 @@
 import React, { FC, useEffect, useState } from 'react';
 import FileUpload from './FilesUpload';
 import classNames from 'classnames';
-import { DatePicker, Input, TreeSelect, Form, Checkbox, Button } from 'antd';
+import { DatePicker, Input, TreeSelect, Form, Checkbox, Button, Spin } from 'antd';
 import moment from 'moment';
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import { FormInstance } from 'antd/lib/form';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 import css from './form-calculate.module.scss';
-import { loadStripe } from '@stripe/stripe-js';
-
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "column"
-  },
-  section: {
-    flexGrow: 1
-  }
-});
-
-const languageData = [
-  {value:'German', title:"German"},
-  {value:'English', title:"English"},
-  {value:'French', title:"French"},
-  {
-    value:'all', title:"All languages", selectable: false, disabled: true, children: [
-      {value:'German ', title:"German"},
-      {value:'English ', title:"English"},
-      {value:'French ', title:"French"},
-    ]
-  }
-];
+import useTranslation from '../../pages/translation';
+import { useRouter } from 'next/router';
+import { getLanguages } from '../../api/general';
 
 const subjectAreaData = [
-  {value:'Translation', title:'Translation (inkl. Revision)'},
-  {value:'Proofreading', title:'Proofreading'},
+  {value:'Translation', title:'Translation (inkl. Revision)', title_de: 'Übersetzung (inkl. Revision)'},
+  {value:'Proofreading', title:'Proofreading', title_de: 'Korrektur'},
 ];
 
 const tProps = {
@@ -42,140 +22,185 @@ const tProps = {
   style: { width: '100%' }
 };
 
-const stripePromise = loadStripe('pk_test_51J5RtSDgcFJAf3LSUWpMGGMJAX5XpjEvdqrtoDpKfiwPvDjJoY91T9Fqw99I7ZY5mWak1uRSJC84XuKn0HNUt4DA00XMtOKbaY');
-
 const FormCalculate: FC = () => {
   const [firstStepData, seFirstStepData] = useState({
-    lngFrom: 'French',
-    lngTo: 'German',
+    lngFrom: 'en',
+    lngTo: 'de',
     service: 'Translation',
     files: '',
     date: moment().add(1,'days').set({h: 12, m: 0})
   });
-  const [isClient, setIsClient] = useState(false);
-  const [hasFiles, setHasFiles] = useState(false);
+  const [filesData, setFilesData] = useState<{files: boolean, price: number, count: number, strKey: string}>
+  ({files: false, price: 0, count: 0, strKey: ''});
+  const [languageData, setLanguageData] = useState<any>([]);
+  const [languageDataServer, setLanguageDataServer] = useState<any>([]);
   const [isFistStep, setFistStep] = useState(true);
   const [fistStepEmitted, setFistStepEmitted] = useState(false);
+  const [showService, setShowService] = useState(false);
   const formRef = React.createRef<FormInstance>();
   const [checked, setChecked] = useState(false);
+  const [cardError, setCardError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [pricePerWord, setPricePerWord] = useState(0);
+  const { t } = useTranslation();
+  const router = useRouter();
 
   const onCheckboxChange = async (e: any) => {
     await setChecked(true);
     console.log(e);
   };
 
-  useEffect(() => {
-    setIsClient(true)
-  }, []);
-
-  const getFiles = (e: any) => {
-    setHasFiles(e && e.length)
+  const wordPriceInit = () => {
+    setTimeout(() => {
+      const priceList = languageDataServer.find((val:any) => val.code === firstStepData.lngFrom);
+      if(priceList) {
+        const val = priceList.translates_to[firstStepData.lngTo];
+        setPricePerWord(!!val ? val : 0);
+      }
+    });
   };
 
-  const [loading, setLoading] = useState(false);
+  const languagesInit = () => {
+    const lng = router.query?.lang === 'de' ? 'de' : 'en';
+    setLanguageData([]);
+    if(languageDataServer.length){
+      const data = languageDataServer.map((val: any) => {
+        return {value: val.code, title: lng === 'de' ? val.title_de : val.title_en}
+      });
+      setLanguageData(data);
+
+      wordPriceInit();
+    }
+  };
+
+  const loadLanguages = async () => {
+    const list = await getLanguages();
+    setLanguageDataServer(list?.languages?.length ? list.languages : []);
+  };
+
+  useEffect(() => {
+    loadLanguages();
+  }, []);
+
+  useEffect(() => {
+    languagesInit();
+  }, [languageDataServer]);
+
+  useEffect(() => {
+    languagesInit();
+
+    // reload servise dropdown
+    setShowService(false);
+    setTimeout(() => {
+      setShowService(true);
+    });
+  }, [router]);
+
+  const getFiles = (e: {files: any, price: number, count: number, key: string}) => {
+    setFilesData({files: e.files && e.files.length, price: e.price, count: e.count, strKey: e.key});
+  };
+
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const cardCheck = () => {
+    const cardContainer = document.getElementsByClassName('StripeElement')[0];
+    const cardComplete = cardContainer.classList.contains('StripeElement--complete');
+    setCardError(!cardComplete);
+  };
 
   const submit = async () => {
     if(isFistStep) {
       setFistStepEmitted(true);
-      if(hasFiles) {
+      if(filesData.files) {
         setFistStep(false);
-      } else {
-
       }
     } else {
-      formRef.current!.submit();
 
-      try {
-        const values = await formRef.current!.validateFields();
+      const cardContainer = document.getElementsByClassName('StripeElement')[0];
+      const cardComplete = cardContainer.classList.contains('StripeElement--complete');
+      setCardError(!cardComplete);
 
-        setLoading(true);
-        const stripe = await stripePromise;
+      if(cardComplete) {
+        try {
+          formRef.current!.submit();
 
-        // @ts-ignore
-        const {error} = await stripe.redirectToCheckout({
-          lineItems: [{
-            price: 'price_1J5ZdIDgcFJAf3LS8pRiiBL3',
-            quantity: 100
-          }],
-          submitType: 'pay',
-          customerEmail: values.email,
-          mode: 'payment',
-          cancelUrl: window.location.origin,
-          successUrl: window.location.origin
-        });
-        if(error) {
+          const values = await formRef.current!.validateFields();
           setLoading(false);
+
+          const paymentIntent = filesData.strKey;
+
+          // @ts-ignore
+          const cardElement = elements.getElement(CardElement);
+
+          return false;
+          // @ts-ignore
+          const paymentMethod = await stripe.createPaymentMethod({
+            type: 'card',
+            // @ts-ignore
+            card: cardElement,
+            billing_details: {
+              name: `${values.firstname} ${values.lastname}`,
+              email: values.email,
+            }
+          });
+
+          // @ts-ignore
+          await stripe.confirmCardPayment(paymentIntent,{
+            // @ts-ignore
+            payment_method: paymentMethod.paymentMethod.id
+          });
+        } catch (e) {
+          console.log('Error----', e);
         }
-
-      } catch (errorInfo) {
-        console.log('Failed:', errorInfo);
-        return false;
+      } else {
+        formRef.current!.submit();
       }
-
     }
   };
 
-  const MyDocument = () => (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.section}>
-          <Text style={{ marginBottom: '30px'}}>{moment().format('MMMM Do YYYY, h:mm:ss a')}</Text>
-
-          <Text>Service: <Text style={{ color: '#414141'}}>{firstStepData.service}</Text></Text>
-          <Text>Language combination: <Text style={{ color: '#414141'}}>{firstStepData.lngFrom}  `{'>'}` {firstStepData.lngTo}</Text></Text>
-          <Text>Delivery time: <Text style={{ color: '#414141'}}>{moment(firstStepData.date).format('MMMM Do YYYY, h:mm:ss a')}</Text></Text>
-          <Text style={{ marginBottom: '30px' }}>Price: <Text style={{ color: '#414141'}}>197.0 CHF</Text></Text>
-
-          <Text>Our minimum price with 3-to 5-day delivery is CHF 103.32</Text>
-        </View>
-      </Page>
-    </Document>
-  );
-
-  const Print = () => (
-    <PDFDownloadLink document={<MyDocument />} fileName="word-count-offer.pdf">
-      {({ loading }) => (loading ? 'Loading document...' : 'Create offer (PDF)')}
-    </PDFDownloadLink>
-  );
 
   const stepOne = <div className={css.orange}>
-    <h3>Calculate quote</h3>
-    <p>Files</p>
+    <h3>{t("quote")}</h3>
+    <p>{t("files")}</p>
 
-    <FileUpload handleChange={getFiles} checkError={fistStepEmitted && !hasFiles} />
+    <FileUpload handleChange={getFiles} lngFrom={firstStepData.lngFrom} lngTo={firstStepData.lngTo}
+                checkError={fistStepEmitted && !filesData.files} handleLoading={(e:any) => {setLoading(e)}}/>
 
-    <div className={classNames(css.group, css.groupArrow)}>
-      <div>
-        <p>Source language</p>
-        {/*
-          // @ts-ignore */}
-        <TreeSelect value={firstStepData.lngFrom} treeData={languageData} {...tProps}
-                    placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, lngFrom: e})}}
-        />
-      </div>
-      <span>&#8594;</span>
-      <div>
-        <p>Target language</p>
-        {/*
-          // @ts-ignore */}
-        <TreeSelect value={firstStepData.lngTo} treeData={languageData} {...tProps}
-                    placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, lngTo: e})}}
-        />
-      </div>
-    </div>
+    {languageData.length ?
+      <div className={classNames(css.group, css.groupArrow)}>
+        <div>
+          <p>{t("source")}</p>
+          {/*
+            // @ts-ignore */}
+          <TreeSelect value={firstStepData.lngFrom} treeData={languageData} {...tProps}
+                      onChange={(e:string) => {seFirstStepData({...firstStepData, lngFrom: e})}}/>
+        </div>
+        <span>&#8594;</span>
+        <div>
+          <p>{t("target")}</p>
+          {/*
+            // @ts-ignore */}
+          <TreeSelect value={firstStepData.lngTo} treeData={languageData} {...tProps}
+                      onChange={(e:string) => {seFirstStepData({...firstStepData, lngTo: e})}}/>
+        </div>
+      </div> : ''
+    }
 
     <div className={css.group}>
       <div>
-        <p>Choose service</p>
+        <p>{t("service")}</p>
         {/*
           // @ts-ignore */}
-        <TreeSelect value={firstStepData.service} treeData={subjectAreaData} {...tProps} treeNodeLabelProp={'value'}
-                    placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, service: e})}}
-        />
+        { showService &&
+          <TreeSelect value={firstStepData.service} treeData={subjectAreaData} {...tProps}
+                      treeNodeLabelProp={router.query?.lang == 'de' ? 'title_de' : 'title'}
+                      placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, service: e})}}
+        />}
       </div>
       <span />
       <div>
-        <p>Delivery time</p>
+        <p>{t("delivery")}</p>
         <DatePicker showTime showNow={false} defaultValue={firstStepData.date} format="DD.MM.YY" allowClear={false}
                     onChange={(e) => {seFirstStepData({...firstStepData, date: moment(e)})}}/>
       </div>
@@ -183,70 +208,67 @@ const FormCalculate: FC = () => {
   </div>;
 
   const stepTwo = <Form className={css.orange} ref={formRef}>
-    <p className={css.back} onClick={() => {setFistStep(true); setFistStepEmitted(false)}}><span>&#8592;</span> Back</p>
+    <p className={css.back} onClick={() => {setFistStep(true); setFistStepEmitted(false)}}><span>&#8592; </span>
+      {t('back')}</p>
 
     <div className={css.group}>
       <div>
-        <p>First name</p>
-        <Form.Item name="firstname" rules={[{ required: true, message: 'this field is mandatory' }]}
-        ><Input placeholder="First name" /></Form.Item>
+        <p>{t("first")}</p>
+        <Form.Item name="firstname" rules={[{ required: true, message: t('mandatory') }]}
+        ><Input placeholder={t("first")} /></Form.Item>
       </div>
       <span />
       <div>
-        <p>Last name</p>
-        <Form.Item name="lastname" rules={[{ required: true, message: 'this field is mandatory' }]}
-        ><Input placeholder="Last name" /></Form.Item>
+        <p>{t("last")}</p>
+        <Form.Item name="lastname" rules={[{ required: true, message: t('mandatory') }]}
+        ><Input placeholder={t("last")} /></Form.Item>
       </div>
     </div>
 
     <div className={css.group}>
       <div>
-        <p>Company name <span>(optional)</span></p>
-        <Input placeholder="Company name" />
-      </div>
-      <span />
-      <div>
-        <p>City</p>
-        <Form.Item name="City" rules={[{ required: true, message: 'this field is mandatory' }]}
-        ><Input placeholder="City" /></Form.Item>
+        <p>{t("company")} <span>{t("optional")}</span></p>
+        <Input placeholder={t("company")}  />
       </div>
     </div>
 
     <div className={css.group}>
       <div>
-        <p>Street</p>
-        <Form.Item name="Street" rules={[{ required: true, message: 'this field is mandatory' }]}
-        ><Input placeholder="Street" /></Form.Item>
+        <p>{t("street")}</p>
+        <Form.Item name="Street" rules={[{ required: true, message: t('mandatory') }]}
+        ><Input placeholder={t("street")} /></Form.Item>
       </div>
       <span />
       <div>
-        <p>Zip code</p>
-        <Form.Item name="Zip" rules={[{ required: true, message: 'this field is mandatory' }]}
-        ><Input placeholder="Zip code" /></Form.Item>
+        <p>{t("city")}</p>
+        <Form.Item name="City" rules={[{ required: true, message: t('mandatory') }]}
+        ><Input placeholder={t("city")} /></Form.Item>
       </div>
     </div>
 
     <div className={css.group}>
       <div>
-        <p>E-Mail</p>
+        <p>{t("email")}</p>
         <Form.Item name="email" rules={[{ required: true, pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-          message: 'email is invalid' }]}
-        ><Input placeholder="E-Mail" /></Form.Item>
+          message: t('emailError') }]}
+        ><Input placeholder={t("email")} /></Form.Item>
       </div>
       <span />
       <div>
-        <p>Phone number</p>
-        <Form.Item name="Phone" rules={[{ required: true, message: 'this field is mandatory' }]}
-        ><Input placeholder="Phone" /></Form.Item>
+        <p>{t("phone")}</p>
+        <Form.Item name="Phone" rules={[{ required: true, message: t('mandatory') }]}
+        ><Input placeholder={t("phone")} /></Form.Item>
       </div>
     </div>
 
-    {/*<p>Credit Card</p>*/}
-    {/*<CardElement className={css.card}/>*/}
+    <p>{t("credit")}</p>
+    <CardElement className={css.card} onBlur={cardCheck} onFocus={() => setCardError(false)}/>
+    {cardError && <span className={css.cardError}>{t('creditError')}</span>}
+
     <Form.Item name="remember" valuePropName="checked"
-               rules={[{ required: true, message: 'this field is mandatory' }]}>
+               rules={[{ required: true, message: t('mandatory') }]}>
       <Checkbox disabled={checked} onChange={onCheckboxChange}>
-        accept  <a>Terms & Conditions</a>
+        {t("accept")}<a>{t("term")}</a>
       </Checkbox>
     </Form.Item>
   </Form>;
@@ -261,15 +283,22 @@ const FormCalculate: FC = () => {
 
       <div className={css.white}>
         <div>
-          <h3>CHF 197.00</h3>
-          <p>AI Translation™ + Refinement by <br/>language experts</p>
-          <p>Price per line: CHF 1.97 (excl. 7.70% VAT)</p>
+          <h3>CHF {filesData.price}</h3>
+          <p>{t('wordPrice')}: {firstStepData.lngFrom} {`->`} {firstStepData.lngTo}:
+            CHF {pricePerWord} </p>
+          <p>{t('count')}: {filesData.count}</p>
         </div>
 
         <div>
-          <Button type="primary" disabled={loading} onClick={submit}> {isFistStep ? 'Next step' : 'Place Order'} </Button>
-          {isClient && !isFistStep && Print()}
+          <Button type="primary" disabled={loading} onClick={submit}> {isFistStep ? t('next') : t('order')} </Button>
         </div>
+
+        {
+          loading &&
+          <div className={css.loading}>
+            <Spin size="large" />
+          </div>
+        }
       </div>
     </div>
   );

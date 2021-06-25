@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Button } from 'antd';
 
 import css from './files-upload.module.scss';
-import useTranslation from '../../../pages/translation';
+import useTranslation from '../../../common/translation';
 import { filesUpload } from '../../../api/general';
 import { alertError } from '../../../common/alert';
 

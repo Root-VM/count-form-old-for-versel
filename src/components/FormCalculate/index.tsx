@@ -7,7 +7,7 @@ import { FormInstance } from 'antd/lib/form';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 import css from './form-calculate.module.scss';
-import useTranslation from '../../pages/translation';
+import useTranslation from '../../common/translation';
 import { useRouter } from 'next/router';
 import { getLanguages } from '../../api/general';
 

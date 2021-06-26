@@ -49,7 +49,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
         if(files.length) {
           setFiles([]);
         }
-        handleLoading(true);
+        handleLoading(false);
       });
     } else{
       handleChange({files, price: 0, count: 0, key: ''});

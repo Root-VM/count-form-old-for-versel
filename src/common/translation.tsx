@@ -4,7 +4,7 @@ import { LanguageContext, defaultLocale } from "./language-provider";
 import { LangStrings } from "../assets/translation";
 
 export default function useTranslation() {
-  const [locale] = useContext(LanguageContext)
+  const [locale] = useContext(LanguageContext);
 
   function t(key: string) {
     if (!LangStrings[locale][key]) {

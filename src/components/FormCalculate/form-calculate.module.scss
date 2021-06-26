@@ -179,6 +179,11 @@
   >div{
     width: 100%;
   }
+  .Input{
+    &::placeholder{
+      color: red;
+    }
+  }
 }
 
 @media (max-width: 650px) {

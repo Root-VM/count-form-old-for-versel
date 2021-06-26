@@ -10,6 +10,7 @@ import css from './form-calculate.module.scss';
 import useTranslation from '../../common/translation';
 import { useRouter } from 'next/router';
 import { getLanguages } from '../../api/general';
+import { alertSuccess } from '../../common/alert';
 
 const subjectAreaData = [
   {value:'Translation', title:'Translation (inkl. Revision)', title_de: 'Übersetzung (inkl. Revision)'},
@@ -22,7 +23,21 @@ const tProps = {
   style: { width: '100%' }
 };
 
-const FormCalculate: FC = () => {
+const cardOptions = {
+  style: {
+    base: {
+      color: 'rgba(0, 0, 0, 0.85)',
+      fontSize: '14px',
+      fontFamily: 'Lato, sans-serif',
+      '::placeholder': {
+        color: 'rgba(0, 0, 0, 0.6)',
+      },
+    }
+  }
+};
+
+const FormCalculate: FC<{refresh: any}> = (props) => {
+  const {refresh} = props;
   const [firstStepData, seFirstStepData] = useState({
     lngFrom: 'en',
     lngTo: 'de',
@@ -46,8 +61,15 @@ const FormCalculate: FC = () => {
   const router = useRouter();
 
   const onCheckboxChange = async (e: any) => {
-    await setChecked(true);
-    console.log(e);
+    await setChecked(e.target.checked);
+  };
+
+  // @ts-ignore
+  const validation = (rule: any, value: any, callback: (error?: string) => void) => {
+    if(checked) {
+      return callback()
+    }
+    return callback(t('mandatory'))
   };
 
   const wordPriceInit = () => {
@@ -125,15 +147,15 @@ const FormCalculate: FC = () => {
         try {
           formRef.current!.submit();
 
+          setLoading(true);
+
           const values = await formRef.current!.validateFields();
-          setLoading(false);
 
           const paymentIntent = filesData.strKey;
 
           // @ts-ignore
           const cardElement = elements.getElement(CardElement);
 
-          return false;
           // @ts-ignore
           const paymentMethod = await stripe.createPaymentMethod({
             type: 'card',
@@ -150,11 +172,18 @@ const FormCalculate: FC = () => {
             // @ts-ignore
             payment_method: paymentMethod.paymentMethod.id
           });
+
+          alertSuccess(t('paid'));
+          refresh();
+          setLoading(false);
+
         } catch (e) {
           console.log('Error----', e);
+          setLoading(false);
         }
       } else {
         formRef.current!.submit();
+        setLoading(false);
       }
     }
   };
@@ -262,13 +291,14 @@ const FormCalculate: FC = () => {
     </div>
 
     <p>{t("credit")}</p>
-    <CardElement className={css.card} onBlur={cardCheck} onFocus={() => setCardError(false)}/>
+    <CardElement className={css.card} onBlur={cardCheck} onFocus={() => setCardError(false)}
+                 options={cardOptions}/>
     {cardError && <span className={css.cardError}>{t('creditError')}</span>}
 
-    <Form.Item name="remember" valuePropName="checked"
-               rules={[{ required: true, message: t('mandatory') }]}>
-      <Checkbox disabled={checked} onChange={onCheckboxChange}>
-        {t("accept")}<a>{t("term")}</a>
+    <Form.Item name="checkbox"
+               rules={[{validator: validation}]}>
+      <Checkbox checked={checked} onChange={onCheckboxChange}>
+        {t("accept")} <a> {t("term")}</a>
       </Checkbox>
     </Form.Item>
   </Form>;

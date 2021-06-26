@@ -84,6 +84,12 @@ a {
   min-height: 43px;
   border-radius: 4px;
   box-shadow: 2px 2px 16px 0 rgb(0 0 0 / 30%);
+  font-size: 14px;
+  font-family: Lato, sans-serif;
+  color: rgba(0, 0, 0, 0.85);
+  &::placeholder{
+    color: rgba(0, 0, 0, 0.6);
+  }
 }
 .ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
   background: #01a6d1;
@@ -186,4 +192,7 @@ a {
   &:after{
     border-color: white!important;
   }
+}
+.ant-spin-dot-item{
+  background-color: #01a6d1;
 }

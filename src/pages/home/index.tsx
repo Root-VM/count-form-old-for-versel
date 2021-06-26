@@ -11,6 +11,7 @@ const stripeKey = 'pk_test_51J5s99AvELlGorryzt5EWFSzttRlABeINQqCWiNwfGqbjCOadYuL
 
 const HomePage: FC = () => {
   const [value, setValue] = useState('en');
+  const [show, setShow] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,6 +21,12 @@ const HomePage: FC = () => {
   const handleChange = (e: any) => {
     setValue(e.target.value);
   };
+  const reload = () => {
+    setShow(false);
+    setTimeout(() => {
+      setShow(true);
+    })
+  };
 
   return (
     <>
@@ -28,11 +35,13 @@ const HomePage: FC = () => {
         <Radio.Button value="de">de</Radio.Button>
       </Radio.Group>
       <div className={css.page}>
-        {/*
+        {show && <>
+          {/*
           // @ts-ignore */}
-        <Elements options={{ locale: value }} key={value} stripe={loadStripe(stripeKey)}>
-          <FormCalculate />
-        </Elements>
+          <Elements options={{ locale: value }} key={value} stripe={loadStripe(stripeKey)}>
+            <FormCalculate refresh={reload} />
+          </Elements>
+        </>}
       </div>
     </>
   );

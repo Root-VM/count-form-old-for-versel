@@ -144,9 +144,12 @@ a {
       border-bottom: 1px solid #eb5757;
       position: relative;
       padding-left: 20px;
+      text-shadow: 1px 1px 3px #000000;
       &:before{
         content: '';
         background-image: url('/static/img/error.png');
+        box-shadow: 1px 1px 3px rgb(0 0 0 / 68%);
+        border-radius: 20px;
         position: absolute;
         left: 0;
         top: 0;
@@ -162,12 +165,12 @@ a {
     color: white;
     a{
       color: white;
-      border-bottom: 1px solid #32869c;
+      border-bottom: 1px solid white;
     }
   }
 }
 .ant-checkbox-checked .ant-checkbox-inner{
-  background-color: #01a6d1;
+  background-color: #616d74;
 }
 .ant-btn{
   border: none;
@@ -188,6 +191,9 @@ a {
   transition: .3s;
   box-shadow: 2px 2px 16px 0 rgb(0 0 0 / 30%);
   min-height: 39px;
+  &:hover{
+    opacity: .7;
+  }
 }
 .ant-btn-primary{
   &:hover, &:focus{
@@ -195,7 +201,7 @@ a {
   }
 }
 .ant-checkbox-disabled .ant-checkbox-inner{
-  border-color: #01a6d1!important;
+  border-color: #616d74!important;
   &:after{
     border-color: white!important;
   }

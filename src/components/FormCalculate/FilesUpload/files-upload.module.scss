@@ -14,8 +14,7 @@
       }
     }
     button{
-      background: #5b5b5b;
-      color: #eb5757;
+      color: white;
     }
   }
   .files{
@@ -79,6 +78,7 @@
   font-size: 12px;
   width: fit-content;
   color: white;
+  text-shadow: 1px 1px 3px #000000;
   border-bottom: 1px solid #eb5757;
   position: relative;
   padding-left: 20px;
@@ -86,6 +86,8 @@
     content: '';
     background-image: url('/static/img/error.png');
     position: absolute;
+    box-shadow: 1px 1px 3px rgb(0 0 0 / 68%);
+    border-radius: 20px;
     left: 0;
     top: 0;
     width: 16px;

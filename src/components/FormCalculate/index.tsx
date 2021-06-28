@@ -32,8 +32,8 @@ const cardOptions = {
   }
 };
 
-const FormCalculate: FC<{refresh: any}> = (props) => {
-  const {refresh} = props;
+const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string}> = (props) => {
+  const {refresh, mainColor, secondaryColor} = props;
   const [firstStepData, seFirstStepData] = useState({
     lngFrom: 'en',
     lngTo: 'de',
@@ -190,12 +190,14 @@ const FormCalculate: FC<{refresh: any}> = (props) => {
   };
 
 
-  const stepOne = <div className={css.orange}>
+  const stepOne = <div className={css.orange} style={{backgroundColor: mainColor}}>
     <h3>{t("quote")}</h3>
     <p>{t("files")}</p>
 
     <FileUpload handleChange={getFiles} lngFrom={firstStepData.lngFrom} lngTo={firstStepData.lngTo}
-                checkError={fistStepEmitted && !filesData.files} handleLoading={(e:any) => {setLoading(e)}}/>
+                checkError={fistStepEmitted && !filesData.files} handleLoading={(e:any) => {setLoading(e)}}
+                color={secondaryColor}
+    />
 
     {languageData.length ?
       <div className={classNames(css.group, css.groupArrow)}>
@@ -236,7 +238,7 @@ const FormCalculate: FC<{refresh: any}> = (props) => {
     </div>
   </div>;
 
-  const stepTwo = <Form className={css.orange} ref={formRef}>
+  const stepTwo = <Form className={css.orange} ref={formRef} style={{backgroundColor: mainColor}}>
     <p className={css.back} onClick={() => {setFistStep(true); setFistStepEmitted(false)}}><span>&#8592; </span>
       {t('back')}</p>
 
@@ -320,7 +322,9 @@ const FormCalculate: FC<{refresh: any}> = (props) => {
         </div>
 
         <div>
-          <Button type="primary" disabled={loading} onClick={submit}> {isFistStep ? t('next') : t('order')} </Button>
+          <Button type="primary" disabled={loading} onClick={submit} style={{backgroundColor: secondaryColor}}>
+            {isFistStep ? t('next') : t('order')}
+          </Button>
         </div>
 
         {

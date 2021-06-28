@@ -11,9 +11,9 @@ const toMbSize = (e: number) => {
   return (e / (1024*1024)).toFixed(2);
 };
 
-const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean, lngFrom: string, lngTo: string}> = (props) => {
+const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean, lngFrom: string, lngTo: string, color: string}> = (props) => {
   const [files, setFiles] = useState<any>([]);
-  const { handleChange, handleLoading, checkError, lngFrom, lngTo } = props;
+  const { handleChange, handleLoading, checkError, lngFrom, lngTo, color } = props;
   const { t } = useTranslation();
 
   const getPhoto = async (e: any) => {
@@ -95,7 +95,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
         }
       </div>
 
-      <Button type="primary" className={css.grey}>{t('selectFiles')}</Button>
+      <Button type="primary" className={css.grey} style={{backgroundColor: color}}>{t('selectFiles')}</Button>
 
       {checkError &&
         <>

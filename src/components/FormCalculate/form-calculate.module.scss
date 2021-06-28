@@ -235,9 +235,12 @@
   border-bottom: 1px solid #eb5757;
   position: relative;
   padding-left: 20px;
+  text-shadow: 1px 1px 3px #000000;
   &:before{
     content: '';
     background-image: url('/static/img/error.png');
+    box-shadow: 1px 1px 3px rgb(0 0 0 / 68%);
+    border-radius: 20px;
     position: absolute;
     left: 0;
     top: 0;

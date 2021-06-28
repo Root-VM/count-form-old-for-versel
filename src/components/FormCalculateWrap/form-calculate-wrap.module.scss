@@ -1,0 +1,12 @@
+.wrap {
+  display: flex;
+  width: 100vw;
+  justify-content: center;
+  padding: 40px;
+}
+
+@media (max-width: 650px) {
+  .wrap{
+    padding: 20px;
+  }
+}

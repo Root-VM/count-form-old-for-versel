@@ -26,11 +26,12 @@ const tProps = {
 const cardOptions = {
   style: {
     base: {
-      color: 'rgba(0, 0, 0, 0.85)',
+      color: 'rgba(0, 0, 0, 0.7)',
       fontSize: '14px',
-      fontFamily: 'Lato, sans-serif',
+      fontFamily: 'sans-serif',
       '::placeholder': {
-        color: 'rgba(0, 0, 0, 0.6)',
+        fontSize: '14px',
+        color: 'rgba(0, 0, 0, 0.4)',
       },
     }
   }

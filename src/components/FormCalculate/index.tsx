@@ -12,11 +12,6 @@ import { useRouter } from 'next/router';
 import { getLanguages } from '../../api/general';
 import { alertSuccess } from '../../common/alert';
 
-const subjectAreaData = [
-  {value:'Translation', title:'Translation (inkl. Revision)', title_de: 'Übersetzung (inkl. Revision)'},
-  {value:'Proofreading', title:'Proofreading', title_de: 'Korrektur'},
-];
-
 const tProps = {
   treeDefaultExpandAll: false,
   dropdownStyle: { maxHeight: 400, overflow: 'auto' },
@@ -60,6 +55,11 @@ const FormCalculate: FC<{refresh: any}> = (props) => {
   const [pricePerWord, setPricePerWord] = useState(0);
   const { t } = useTranslation();
   const router = useRouter();
+
+  const subjectAreaData = [
+    {value:'Translation', title: router.query?.lang !== 'de' ? 'Translation (inkl. Revision)' : 'Übersetzung (inkl. Revision)'},
+    {value:'Proofreading', title: router.query?.lang !== 'de' ? 'Proofreading' : 'Korrektur'},
+  ];
 
   const onCheckboxChange = async (e: any) => {
     await setChecked(e.target.checked);
@@ -224,7 +224,6 @@ const FormCalculate: FC<{refresh: any}> = (props) => {
           // @ts-ignore */}
         { showService &&
           <TreeSelect value={firstStepData.service} treeData={subjectAreaData} {...tProps}
-                      treeNodeLabelProp={router.query?.lang == 'de' ? 'title_de' : 'title'}
                       placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, service: e})}}
         />}
       </div>

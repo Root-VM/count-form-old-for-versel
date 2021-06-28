@@ -1,5 +1,5 @@
 // export const apiUrl = 'http://35.156.136.1:3000';
-export const apiUrl = 'http://wordcount.nadlo.ch';
+export const apiUrl = 'https://wordcount.nadlo.ch';
 
 export const filesUpload = async (data: FormData) => {
   const response = await fetch(`${apiUrl}/words/price`, {

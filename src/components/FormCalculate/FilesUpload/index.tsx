@@ -18,7 +18,6 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
 
   const getPhoto = async (e: any) => {
     if(!!e && !!e.target.files[0]) {
-      console.log('e.target.files', e.target.files[0]);
       await setFiles([...files, e.target.files[0]]);
     }
   };

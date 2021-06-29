@@ -191,7 +191,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
 
 
   const stepOne = <div className={css.orange} style={{backgroundColor: mainColor}}>
-    <h3>{t("quote")}</h3>
+    <h3>{t("quote")}{mainColor}</h3>
     <p>{t("files")}</p>
 
     <FileUpload handleChange={getFiles} lngFrom={firstStepData.lngFrom} lngTo={firstStepData.lngTo}

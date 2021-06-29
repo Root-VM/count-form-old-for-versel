@@ -9,6 +9,16 @@ export const filesUpload = async (data: FormData) => {
   });
   return response.json();
 };
+
+export const pusrchased = async (data: FormData) => {
+  const response = await fetch(`${apiUrl}/words/purchased`, {
+    method: 'POST',
+    headers: {},
+    body: data
+  });
+  return response.json();
+};
+
 export const getLanguages = async () => {
   try{
     const response = await fetch(`${apiUrl}/words/languages`, {
@@ -19,5 +29,4 @@ export const getLanguages = async () => {
     console.log('Error-----', e);
     return {languages: []};
   }
-
 };

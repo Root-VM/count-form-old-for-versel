@@ -9,7 +9,7 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import css from './form-calculate.module.scss';
 import useTranslation from '../../common/translation';
 import { useRouter } from 'next/router';
-import { getLanguages } from '../../api/general';
+import { getLanguages, pusrchased } from '../../api/general';
 import { alertSuccess } from '../../common/alert';
 
 const tProps = {
@@ -41,8 +41,8 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
     files: '',
     date: moment().add(1,'days').set({h: 12, m: 0})
   });
-  const [filesData, setFilesData] = useState<{files: boolean, price: number, count: number, strKey: string}>
-  ({files: false, price: 0, count: 0, strKey: ''});
+  const [filesData, setFilesData] = useState<{files: any, price: number, count: number, strKey: string}>
+  ({files: [], price: 0, count: 0, strKey: ''});
   const [languageData, setLanguageData] = useState<any>([]);
   const [languageDataServer, setLanguageDataServer] = useState<any>([]);
   const [isFistStep, setFistStep] = useState(true);
@@ -120,7 +120,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   }, [router]);
 
   const getFiles = (e: {files: any, price: number, count: number, key: string}) => {
-    setFilesData({files: e.files && e.files.length, price: e.price, count: e.count, strKey: e.key});
+    setFilesData({files: e.files, price: e.price, count: e.count, strKey: e.key});
   };
 
   const stripe = useStripe();
@@ -135,7 +135,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   const submit = async () => {
     if(isFistStep) {
       setFistStepEmitted(true);
-      if(filesData.files) {
+      if(filesData.files.length) {
         setFistStep(false);
       }
     } else {
@@ -169,10 +169,28 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
           });
 
           // @ts-ignore
-          await stripe.confirmCardPayment(paymentIntent,{
+          const stripeData = await stripe.confirmCardPayment(paymentIntent,{
             // @ts-ignore
             payment_method: paymentMethod.paymentMethod.id
           });
+
+
+          const formData = new FormData();
+
+          for(const file of filesData.files) {
+            formData.append('files', file);
+          }
+          formData.append('translateTo', firstStepData.lngTo);
+          formData.append('translateFrom', firstStepData.lngFrom);
+          formData.append('paymentIntentSecret', String(stripeData?.paymentIntent?.client_secret));
+          formData.append('paymentIntentId', String(stripeData?.paymentIntent?.id));
+          formData.append('type', firstStepData.service);
+          formData.append('deliveryTime', firstStepData.date.format());
+          formData.append('name', `${values.firstname} ${values.lastname}`);
+          formData.append('email', values.email);
+          formData.append('phone', values.phone);
+
+          await pusrchased(formData);
 
           alertSuccess(t('paid'));
           refresh();
@@ -195,7 +213,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
     <p>{t("files")}</p>
 
     <FileUpload handleChange={getFiles} lngFrom={firstStepData.lngFrom} lngTo={firstStepData.lngTo}
-                checkError={fistStepEmitted && !filesData.files} handleLoading={(e:any) => {setLoading(e)}}
+                checkError={fistStepEmitted && !filesData.files.length} handleLoading={(e:any) => {setLoading(e)}}
                 color={secondaryColor}
     />
 
@@ -287,7 +305,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
       <span />
       <div>
         <p>{t("phone")}</p>
-        <Form.Item name="Phone" rules={[{ required: true, message: t('mandatory') }]}
+        <Form.Item name="phone" rules={[{ required: true, message: t('mandatory') }]}
         ><Input placeholder={t("phone")} /></Form.Item>
       </div>
     </div>
@@ -322,7 +340,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
         </div>
 
         <div>
-          <Button type="primary" disabled={loading} onClick={submit} style={{backgroundColor: secondaryColor}}>
+          <Button type="primary" onClick={submit} style={{backgroundColor: secondaryColor}}>
             {isFistStep ? t('next') : t('order')}
           </Button>
         </div>

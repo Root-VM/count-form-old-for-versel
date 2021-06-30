@@ -9,7 +9,7 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import css from './form-calculate.module.scss';
 import useTranslation from '../common/translation';
 import { useRouter } from 'next/router';
-import { getLanguages, pusrchased } from '../common/api';
+import { filesUpload, getLanguages, pusrchased } from '../common/api';
 import { alertSuccess } from '../common/alert';
 
 const tProps = {
@@ -41,8 +41,8 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
     files: '',
     date: moment().add(1,'days').set({h: 12, m: 0})
   });
-  const [filesData, setFilesData] = useState<{files: any, price: number, count: number, strKey: string}>
-  ({files: [], price: 0, count: 0, strKey: ''});
+  const [filesData, setFilesData] = useState<{files: any, price: number, count: number}>
+  ({files: [], price: 0, count: 0});
   const [languageData, setLanguageData] = useState<any>([]);
   const [languageDataServer, setLanguageDataServer] = useState<any>([]);
   const [isFistStep, setFistStep] = useState(true);
@@ -119,8 +119,8 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
     });
   }, [router]);
 
-  const getFiles = (e: {files: any, price: number, count: number, key: string}) => {
-    setFilesData({files: e.files, price: e.price, count: e.count, strKey: e.key});
+  const getFiles = (e: {files: any, price: number, count: number}) => {
+    setFilesData({files: e.files, price: e.price, count: e.count});
   };
 
   const stripe = useStripe();
@@ -152,8 +152,6 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
 
           const values = await formRef.current!.validateFields();
 
-          const paymentIntent = filesData.strKey;
-
           // @ts-ignore
           const cardElement = elements.getElement(CardElement);
 
@@ -168,13 +166,6 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
             }
           });
 
-          // @ts-ignore
-          const stripeData = await stripe.confirmCardPayment(paymentIntent,{
-            // @ts-ignore
-            payment_method: paymentMethod.paymentMethod.id
-          });
-
-
           const formData = new FormData();
 
           for(const file of filesData.files) {
@@ -182,6 +173,15 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
           }
           formData.append('translateTo', firstStepData.lngTo);
           formData.append('translateFrom', firstStepData.lngFrom);
+
+          const payment = await filesUpload(formData);
+
+          // @ts-ignore
+          const stripeData = await stripe.confirmCardPayment(payment.paymentIntent,{
+            // @ts-ignore
+            payment_method: paymentMethod.paymentMethod.id
+          });
+
           formData.append('paymentIntentSecret', String(stripeData?.paymentIntent?.client_secret));
           formData.append('paymentIntentId', String(stripeData?.paymentIntent?.id));
           formData.append('type', firstStepData.service);

@@ -4,7 +4,7 @@ import { Button } from 'antd';
 
 import css from './files-upload.module.scss';
 import useTranslation from '../common/translation';
-import { filesUpload } from '../common/api';
+import { fileUpload } from '../common/api';
 import { alertError } from '../common/alert';
 
 const toMbSize = (e: number) => {
@@ -13,48 +13,51 @@ const toMbSize = (e: number) => {
 
 const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean, lngFrom: string, lngTo: string, color: string}> = (props) => {
   const [files, setFiles] = useState<any>([]);
+  const [data, setData] = useState<any>([]);
   const { handleChange, handleLoading, checkError, lngFrom, lngTo, color } = props;
   const { t } = useTranslation();
 
   const getPhoto = async (e: any) => {
-    if(!!e && !!e.target.files[0]) {
-      await setFiles([...files, e.target.files[0]]);
+    const same = files.find((v: any) => e.name == v.name);
+    if(!same) {
+      await setFiles([...files, e]);
     }
   };
 
-  const apiCalculate = () => {
+  const apiCalculate = async () => {
     if(files.length) {
       handleLoading(true);
       const formData = new FormData();
-      for(const file of files) {
-        formData.append('files', file);
-      }
+      formData.append('file', files[files.length - 1]);
       formData.append('translateTo', lngTo);
       formData.append('translateFrom', lngFrom);
 
-      filesUpload(formData).then(data => {
-        if(data?.paymentIntent){
-          handleChange({files, price: data.price, count: data.wordsQuantity, key: data.paymentIntent});
+      try{
+        const val = await fileUpload(formData);
+        if(val?.price){
+          if(data.length < files.length) {
+            setData([...data, { price: val.price, count: val.wordsQuantity }]);
+          }
         } else{
           alertError(t('apiError'));
-          handleChange({files, price: 0, count: 0, key: ''});
           if(files.length) {
             setFiles([]);
+            setData([]);
           }
         }
         handleLoading(false);
-      }).catch(() => {
+      } catch{
         alertError(t('apiError'));
-        handleChange({files, price: 0, count: 0, key: ''});
         if(files.length) {
           setFiles([]);
+          setData([]);
         }
         handleLoading(false);
-      });
+      }
     } else{
-      handleChange({files, price: 0, count: 0, key: ''});
       if(files.length) {
         setFiles([]);
+        setData([]);
       }
     }
   };
@@ -64,22 +67,39 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
   }, [files]);
 
   useEffect(() => {
+    let price = 0;
+    let count = 0;
+
+    for(let item of data) {
+      price += item.price;
+      count += item.count;
+    }
+    handleChange({files, price: price.toFixed(2), count});
+  }, [data, files]);
+
+  useEffect(() => {
     if(lngFrom === lngTo) {
-      handleChange({files: [], price: 0, count: 0, key: ''});
-      setFiles([]);
       alertError(t('sameLng'));
     } else{
-      apiCalculate();
+      setData([]);
+      setFiles([]);
     }
   }, [lngFrom, lngTo]);
 
   const remove = (name: string) => {
-    setFiles(files.filter((e: any) => e.name !== name));
+    let val = data;
+    setFiles(files.filter((e: any, i :number) => {
+      if(e.name == name) {
+        val.splice(i, 1);
+        setData(val);
+      }
+      return e.name !== name
+    }));
   };
 
   return (
     <div className={classNames(css.group, checkError && css.error)}>
-      <input type="file" name="files" onChange={getPhoto}
+      <input type="file" name="files" onChange={(e: any) => {e?.target?.files[0] && getPhoto(e.target.files[0])}}
              accept=".txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .rtf, .xml, .json, .html, .idml, .xliff"/>
 
       <div className={css.files}>

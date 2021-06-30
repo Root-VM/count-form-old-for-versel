@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import FileUpload from './FilesUpload';
+import FileUpload from '../FilesUpload';
 import classNames from 'classnames';
 import { DatePicker, Input, TreeSelect, Form, Checkbox, Button, Spin } from 'antd';
 import moment from 'moment';
@@ -7,10 +7,10 @@ import { FormInstance } from 'antd/lib/form';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 import css from './form-calculate.module.scss';
-import useTranslation from '../../common/translation';
+import useTranslation from '../common/translation';
 import { useRouter } from 'next/router';
-import { getLanguages, pusrchased } from '../../api/general';
-import { alertSuccess } from '../../common/alert';
+import { getLanguages, pusrchased } from '../common/api';
+import { alertSuccess } from '../common/alert';
 
 const tProps = {
   treeDefaultExpandAll: false,

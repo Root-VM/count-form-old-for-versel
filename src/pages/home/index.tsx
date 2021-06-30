@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import css from './home.module.scss';
-import FormCalculateWrap from '../../components/FormCalculateWrap';
+import FormCalculateWrap from '../../widgets/FormCalculateWrap';
 
 
 const HomePage: FC = () => {

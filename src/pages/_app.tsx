@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../assets/css/common.scss';
 import Head from 'next/head';
 import * as React from 'react';
-import { LanguageProvider } from '../common/language-provider';
+import { LanguageProvider } from '../widgets/FormCalculateWrap/common/language-provider';
 import { ToastContainer } from 'react-toastify';
 
 const App = ({ Component, pageProps }: AppProps) => {

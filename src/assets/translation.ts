@@ -32,7 +32,8 @@ export const LangStrings = {
     wordPrice: 'Price per word',
     count: 'words count',
     apiError: 'Api Error, try to use another file',
-    paid: 'successful paid!!! We will contact you soon'
+    paid: 'successful paid!!! We will contact you soon',
+    sameLng: 'please select different languages'
   },
   de: {
     quote: 'Angebot berechnen',
@@ -67,6 +68,7 @@ export const LangStrings = {
     wordPrice: 'Preis pro Wort',
     count: 'Wörter zählen',
     apiError: 'Api-Fehler, versuchen Sie, eine andere Datei zu verwenden',
-    paid: 'erfolgreich bezahlt!!! Wir werden Sie bald kontaktieren'
+    paid: 'erfolgreich bezahlt!!! Wir werden Sie bald kontaktieren',
+    sameLng: 'Bitte wählen Sie verschiedene Sprachen aus'
   }
 };

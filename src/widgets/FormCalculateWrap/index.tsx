@@ -3,7 +3,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from "@stripe/stripe-js";
 import { useRouter } from 'next/router';
 import { Radio } from 'antd';
-import FormCalculate from '../FormCalculate';
+import FormCalculate from './FormCalculate';
 import css from './form-calculate-wrap.module.scss';
 
 const stripeKey = 'pk_test_51J5s99AvELlGorryzt5EWFSzttRlABeINQqCWiNwfGqbjCOadYuLSmdSNZliwDmUoyJrHX8oP6c0Yhn8gUPMfV8T00kyyuRtOj';

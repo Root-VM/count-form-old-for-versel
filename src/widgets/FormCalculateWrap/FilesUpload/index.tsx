@@ -3,9 +3,9 @@ import classNames from 'classnames';
 import { Button } from 'antd';
 
 import css from './files-upload.module.scss';
-import useTranslation from '../../../common/translation';
-import { filesUpload } from '../../../api/general';
-import { alertError } from '../../../common/alert';
+import useTranslation from '../common/translation';
+import { filesUpload } from '../common/api';
+import { alertError } from '../common/alert';
 
 const toMbSize = (e: number) => {
   return (e / (1024*1024)).toFixed(2);
@@ -67,6 +67,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
     if(lngFrom === lngTo) {
       handleChange({files: [], price: 0, count: 0, key: ''});
       setFiles([]);
+      alertError(t('sameLng'));
     } else{
       apiCalculate();
     }

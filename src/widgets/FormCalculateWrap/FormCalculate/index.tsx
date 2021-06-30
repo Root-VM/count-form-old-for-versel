@@ -52,7 +52,6 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   const [checked, setChecked] = useState(false);
   const [cardError, setCardError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [pricePerWord, setPricePerWord] = useState(0);
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -73,16 +72,6 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
     return callback(t('mandatory'))
   };
 
-  const wordPriceInit = () => {
-    setTimeout(() => {
-      const priceList = languageDataServer.find((val:any) => val.code === firstStepData.lngFrom);
-      if(priceList) {
-        const val = priceList.translates_to[firstStepData.lngTo];
-        setPricePerWord(!!val ? val : 0);
-      }
-    });
-  };
-
   const languagesInit = () => {
     const lng = router.query?.lang === 'de' ? 'de' : 'en';
     setLanguageData([]);
@@ -91,8 +80,6 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
         return {value: val.code, title: lng === 'de' ? val.title_de : val.title_en}
       });
       setLanguageData(data);
-
-      wordPriceInit();
     }
   };
 
@@ -334,8 +321,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
       <div className={css.white}>
         <div>
           <h3>CHF {filesData.price}</h3>
-          <p>{t('wordPrice')}: {firstStepData.lngFrom} {`->`} {firstStepData.lngTo}:
-            CHF {pricePerWord} </p>
+          <p>inkl. 7.7% MwSt.</p>
           <p>{t('count')}: {filesData.count}</p>
         </div>
 

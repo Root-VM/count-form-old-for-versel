@@ -321,7 +321,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
       <div className={css.white}>
         <div>
           <h3>CHF {filesData.price}</h3>
-          <p>inkl. 7.7% MwSt.</p>
+          <p>inkl. 7.7% {t('vat')}.</p>
           <p>{t('count')}: {filesData.count}</p>
         </div>
 

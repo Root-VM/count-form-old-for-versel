@@ -33,7 +33,8 @@ export const LangStrings = {
     count: 'words count',
     apiError: 'Api Error, try to use another file',
     paid: 'successful paid!!! We will contact you soon',
-    sameLng: 'please select different languages'
+    sameLng: 'please select different languages',
+    vat: ' VAT'
   },
   de: {
     quote: 'Angebot berechnen',
@@ -69,6 +70,7 @@ export const LangStrings = {
     count: 'Wörter zählen',
     apiError: 'Api-Fehler, versuchen Sie, eine andere Datei zu verwenden',
     paid: 'erfolgreich bezahlt!!! Wir werden Sie bald kontaktieren',
-    sameLng: 'Bitte wählen Sie verschiedene Sprachen aus'
+    sameLng: 'Bitte wählen Sie verschiedene Sprachen aus',
+    vat: ' MwSt'
   }
 };

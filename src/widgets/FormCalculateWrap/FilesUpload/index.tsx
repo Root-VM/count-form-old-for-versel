@@ -14,6 +14,7 @@ const toMbSize = (e: number) => {
 const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean, lngFrom: string, lngTo: string, color: string, service: string}> = (props) => {
   const [files, setFiles] = useState<any>([]);
   const [data, setData] = useState<any>([]);
+  const [showInput, setShowInput] = useState(true);
   const { handleChange, handleLoading, checkError, lngFrom, lngTo, color, service } = props;
   const { t } = useTranslation();
 
@@ -22,6 +23,13 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
     if(!same) {
       await setFiles([...files, e]);
     }
+  };
+
+  const inputReload = () => {
+    setShowInput(false);
+    setTimeout(() => {
+      setShowInput(true);
+    })
   };
 
   const apiCalculate = async () => {
@@ -45,6 +53,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
           if(files.length) {
             setFiles([]);
             setData([]);
+            inputReload();
           }
         }
         handleLoading(false);
@@ -53,6 +62,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
         if(files.length) {
           setFiles([]);
           setData([]);
+          inputReload();
         }
         handleLoading(false);
       }
@@ -60,6 +70,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
       if(files.length) {
         setFiles([]);
         setData([]);
+        inputReload();
       }
     }
   };
@@ -130,6 +141,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
   useEffect(() => {
     setData([]);
     setFiles([]);
+    inputReload();
   }, [service]);
 
   const remove = (name: string) => {
@@ -141,12 +153,16 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
       }
       return e.name !== name
     }));
+
+    inputReload();
   };
 
   return (
     <div className={classNames(css.group, checkError && css.error)}>
+      {showInput &&
       <input type="file" name="files" onChange={(e: any) => {e?.target?.files[0] && getPhoto(e.target.files[0])}}
              accept=".txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .rtf, .xml, .json, .html, .idml, .xliff"/>
+      }
 
       <div className={css.files}>
         {

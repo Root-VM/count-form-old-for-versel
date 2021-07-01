@@ -68,6 +68,34 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
     apiCalculate();
   }, [files]);
 
+  const transformChf = (v: number) => {
+    const el = Number((Math.floor(v * 10) / 10).toFixed(1));
+    const afterDots = Number((Math.floor(v * 100) / 100).toFixed(2));
+    const cond = Number((afterDots - el).toFixed(2));
+    let res = el;
+
+    switch (Number(cond)) {
+      case 0:
+        res += 0;
+        break;
+      case 0.01:
+      case 0.02:
+      case 0.03:
+      case 0.04:
+      case 0.05:
+        res += 0.05;
+        break;
+      case 0.06:
+      case 0.07:
+      case 0.08:
+      case 0.09:
+        res += 0.1;
+        break;
+    }
+
+    return Number(res.toFixed(2));
+  };
+
   useEffect(() => {
     // let price = 0;
     if(data.length) {
@@ -77,7 +105,6 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
         count += item.count;
       }
 
-      console.log(2222222, data, count);
       const pricePerWords = data[0].pricePerWord * count;
       let priceBeforeTaxes = pricePerWords + pricePerWords * data[0].tolerance;
       if(priceBeforeTaxes < data[0].minPrice){
@@ -88,7 +115,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
         Math.round((priceBeforeTaxes + priceBeforeTaxes * data[0].tax) * 100) / 100
       ).toFixed(2);
 
-      handleChange({files, price: priceAfterTaxes, count});
+      handleChange({files, price: transformChf(priceAfterTaxes), count});
     } else{
       handleChange({files, price: 0, count: 0});
     }

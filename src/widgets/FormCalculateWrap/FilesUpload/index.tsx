@@ -11,10 +11,10 @@ const toMbSize = (e: number) => {
   return (e / (1024*1024)).toFixed(2);
 };
 
-const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean, lngFrom: string, lngTo: string, color: string}> = (props) => {
+const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean, lngFrom: string, lngTo: string, color: string, service: string}> = (props) => {
   const [files, setFiles] = useState<any>([]);
   const [data, setData] = useState<any>([]);
-  const { handleChange, handleLoading, checkError, lngFrom, lngTo, color } = props;
+  const { handleChange, handleLoading, checkError, lngFrom, lngTo, color, service } = props;
   const { t } = useTranslation();
 
   const getPhoto = async (e: any) => {
@@ -31,12 +31,14 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
       formData.append('file', files[files.length - 1]);
       formData.append('translateTo', lngTo);
       formData.append('translateFrom', lngFrom);
+      formData.append('type', service);
 
       try{
         const val = await fileUpload(formData);
         if(val?.price){
           if(data.length < files.length) {
-            setData([...data, { price: val.price, count: val.wordsQuantity }]);
+            setData([...data, { price: val.price, count: val.wordsQuantity,
+              minPrice: val.minPrice, pricePerWord: val.pricePerWord, tax: val.tax, tolerance: val.tolerance }]);
           }
         } else{
           alertError(t('apiError'));
@@ -67,24 +69,41 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
   }, [files]);
 
   useEffect(() => {
-    let price = 0;
-    let count = 0;
+    // let price = 0;
+    if(data.length) {
+      let count = 0;
 
-    for(let item of data) {
-      price += item.price;
-      count += item.count;
+      for(let item of data) {
+        count += item.count;
+      }
+
+      console.log(2222222, data, count);
+      const pricePerWords = data[0].pricePerWord * count;
+      let priceBeforeTaxes = pricePerWords + pricePerWords * data[0].tolerance;
+      if(priceBeforeTaxes < data[0].minPrice){
+        priceBeforeTaxes = data[0].minPrice;
+      }
+
+      const priceAfterTaxes = +(
+        Math.round((priceBeforeTaxes + priceBeforeTaxes * data[0].tax) * 100) / 100
+      ).toFixed(2);
+
+      handleChange({files, price: priceAfterTaxes, count});
+    } else{
+      handleChange({files, price: 0, count: 0});
     }
-    handleChange({files, price: price.toFixed(2), count});
   }, [data, files]);
 
   useEffect(() => {
     if(lngFrom === lngTo) {
       alertError(t('sameLng'));
-    } else{
-      setData([]);
-      setFiles([]);
     }
   }, [lngFrom, lngTo]);
+
+  useEffect(() => {
+    setData([]);
+    setFiles([]);
+  }, [service]);
 
   const remove = (name: string) => {
     let val = data;

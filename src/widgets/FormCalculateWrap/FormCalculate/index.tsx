@@ -37,7 +37,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   const [firstStepData, seFirstStepData] = useState({
     lngFrom: 'en',
     lngTo: 'de',
-    service: 'Translation',
+    service: 'translation',
     files: '',
     date: moment().add(1,'days').set({h: 12, m: 0})
   });
@@ -56,8 +56,8 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   const router = useRouter();
 
   const subjectAreaData = [
-    {value:'Translation', title: router.query?.lang !== 'de' ? 'Translation (inkl. Revision)' : 'Übersetzung (inkl. Revision)'},
-    {value:'Proofreading', title: router.query?.lang !== 'de' ? 'Proofreading' : 'Korrektur'},
+    {value:'translation', title: router.query?.lang !== 'de' ? 'Translation (inkl. Revision)' : 'Übersetzung (inkl. Revision)'},
+    {value:'proofreading', title: router.query?.lang !== 'de' ? 'Proofreading' : 'Korrektur'},
   ];
 
   const onCheckboxChange = async (e: any) => {
@@ -160,6 +160,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
           }
           formData.append('translateTo', firstStepData.lngTo);
           formData.append('translateFrom', firstStepData.lngFrom);
+          formData.append('type', firstStepData.service);
 
           const payment = await filesUpload(formData);
 
@@ -171,7 +172,6 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
 
           formData.append('paymentIntentSecret', String(stripeData?.paymentIntent?.client_secret));
           formData.append('paymentIntentId', String(stripeData?.paymentIntent?.id));
-          formData.append('type', firstStepData.service);
           formData.append('deliveryTime', firstStepData.date.format());
           formData.append('name', `${values.firstname} ${values.lastname}`);
           formData.append('email', values.email);
@@ -200,6 +200,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
     <p>{t("files")}</p>
 
     <FileUpload handleChange={getFiles} lngFrom={firstStepData.lngFrom} lngTo={firstStepData.lngTo}
+                service={firstStepData.service}
                 checkError={fistStepEmitted && !filesData.files.length} handleLoading={(e:any) => {setLoading(e)}}
                 color={secondaryColor}
     />

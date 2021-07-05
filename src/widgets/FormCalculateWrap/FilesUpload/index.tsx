@@ -161,17 +161,23 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
     <div className={classNames(css.group, checkError && css.error)}>
       {showInput &&
       <input type="file" name="files" onChange={(e: any) => {e?.target?.files[0] && getPhoto(e.target.files[0])}}
-             accept=".txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .rtf, .xml, .json, .html, .idml, .xliff"/>
+             accept=".txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .rtf, .xml, .json, .html, .idml, .xliff"
+             title=""/>
       }
 
       <div className={css.files}>
+        {showInput &&
+        <input type="file" name="files" onChange={(e: any) => {e?.target?.files[0] && getPhoto(e.target.files[0])}}
+               title=""
+               accept=".txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .rtf, .xml, .json, .html, .idml, .xliff"/>
+        }
         {
           files.length ?
           <div className={css.elements}>
             {files.map((data: File, i: number) => (
               <p key={i}>
                 <img src="/static/img/close-black.svg" alt="close" onClick={() => {remove(data.name)}}/>
-                {data.name}  ({toMbSize(data.size)} MB)
+                <span>{data.name}  ({toMbSize(data.size)} MB)</span>
               </p>
             ))}
           </div> : <p>{checkError ? t('selectFilesError') : t('notSelected')}</p>

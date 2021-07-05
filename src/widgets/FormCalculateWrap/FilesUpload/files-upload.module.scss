@@ -29,7 +29,15 @@
     border-radius: 3px;
     padding: 2px;
     margin-right: 30px;
+    input{
+      z-index: 0;
+      width: 100%;
+      cursor: initial;
+    }
     p{
+      img{
+        position: relative;
+      }
       font-family: var(--font-lato);
       color: var(--color--white);
       font-size: 16px;
@@ -109,6 +117,11 @@
     flex-direction: column;
     .files{
       margin-bottom: 10px;
+      input{
+        top: 0;
+        z-index: 0;
+        bottom: auto;
+      }
     }
     button{
       width: 100%;

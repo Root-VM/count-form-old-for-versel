@@ -32,10 +32,12 @@
     display: flex;
     align-items: center;
     &.groupArrow{
-      margin-bottom: 15px;
       >span{
         margin-top: 34px;
       }
+    }
+    &:not(.groupArrow){
+      margin-bottom: 15px;
     }
     >span{
       color: white;

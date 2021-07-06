@@ -205,34 +205,14 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
                 color={secondaryColor}
     />
 
-    {languageData.length ?
-      <div className={classNames(css.group, css.groupArrow)}>
-        <div>
-          <p>{t("source")}</p>
-          {/*
-            // @ts-ignore */}
-          <TreeSelect value={firstStepData.lngFrom} treeData={languageData} {...tProps}
-                      onChange={(e:string) => {seFirstStepData({...firstStepData, lngFrom: e})}}/>
-        </div>
-        <span>&#8594;</span>
-        <div>
-          <p>{t("target")}</p>
-          {/*
-            // @ts-ignore */}
-          <TreeSelect value={firstStepData.lngTo} treeData={languageData} {...tProps}
-                      onChange={(e:string) => {seFirstStepData({...firstStepData, lngTo: e})}}/>
-        </div>
-      </div> : ''
-    }
-
     <div className={css.group}>
       <div>
         <p>{t("service")}</p>
         {/*
           // @ts-ignore */}
         { showService &&
-          <TreeSelect value={firstStepData.service} treeData={subjectAreaData} {...tProps}
-                      placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, service: e})}}
+        <TreeSelect value={firstStepData.service} treeData={subjectAreaData} {...tProps}
+                    placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, service: e})}}
         />}
       </div>
       <span />
@@ -242,6 +222,31 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
                     onChange={(e) => {seFirstStepData({...firstStepData, date: moment(e)})}}/>
       </div>
     </div>
+
+    {languageData.length ?
+      <div className={classNames(css.group, css.groupArrow)}>
+        <div>
+          <p>{t("source")}</p>
+          {/*
+            // @ts-ignore */}
+          <TreeSelect value={firstStepData.lngFrom} treeData={languageData} {...tProps}
+                      onChange={(e:string) => {seFirstStepData({...firstStepData, lngFrom: e})}}/>
+        </div>
+
+        {firstStepData.service === 'translation' &&
+        <>
+          <span>&#8594;</span>
+          <div>
+            <p>{t("target")}</p>
+            {/*
+            // @ts-ignore */}
+            <TreeSelect value={firstStepData.lngTo} treeData={languageData} {...tProps}
+                        onChange={(e:string) => {seFirstStepData({...firstStepData, lngTo: e})}}/>
+          </div>
+        </>
+        }
+      </div> : ''
+    }
   </div>;
 
   const stepTwo = <Form className={css.orange} ref={formRef} style={{backgroundColor: mainColor}}>
@@ -322,7 +327,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
       <div className={css.white}>
         <div>
           <h3>CHF {filesData.price}</h3>
-          <p>inkl. 7.7% {t('vat')}.</p>
+          <p>{t('incl')}. 7.7% {t('vat')}.</p>
           <p>{t('count')}: {filesData.count}</p>
         </div>
 

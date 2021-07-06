@@ -133,7 +133,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
   }, [data, files]);
 
   useEffect(() => {
-    if(lngFrom === lngTo) {
+    if(lngFrom === lngTo && service === 'translation') {
       alertError(t('sameLng'));
     }
   }, [lngFrom, lngTo]);

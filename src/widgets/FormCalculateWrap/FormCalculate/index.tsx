@@ -158,7 +158,9 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
           for(const file of filesData.files) {
             formData.append('files', file);
           }
-          formData.append('translateTo', firstStepData.lngTo);
+          if(firstStepData.service === 'translation') {
+            formData.append('translateTo', firstStepData.lngTo);
+          }
           formData.append('translateFrom', firstStepData.lngFrom);
           formData.append('type', firstStepData.service);
 

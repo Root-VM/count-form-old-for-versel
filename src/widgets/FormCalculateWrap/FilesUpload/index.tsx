@@ -37,8 +37,10 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
       handleLoading(true);
       const formData = new FormData();
       formData.append('file', files[files.length - 1]);
-      formData.append('translateTo', lngTo);
       formData.append('translateFrom', lngFrom);
+      if(service === 'translation') {
+        formData.append('translateTo', lngTo);
+      }
       formData.append('type', service);
 
       try{

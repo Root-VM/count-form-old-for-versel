@@ -45,7 +45,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
 
       // try{
         const val = await fileUpload(formData);
-        if(val?.price){
+        if(val?.pricePerWord){
           if(data.length < files.length) {
             setData([...data, { price: val.price, count: val.wordsQuantity,
               minPrice: val.minPrice, pricePerWord: val.pricePerWord, tax: val.tax, tolerance: val.tolerance }]);

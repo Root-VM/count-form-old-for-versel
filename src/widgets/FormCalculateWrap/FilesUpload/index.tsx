@@ -43,7 +43,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
       }
       formData.append('type', service);
 
-      try{
+      // try{
         const val = await fileUpload(formData);
         if(val?.price){
           if(data.length < files.length) {
@@ -59,15 +59,15 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
           }
         }
         handleLoading(false);
-      } catch{
-        alertError(t('apiError'));
-        if(files.length) {
-          setFiles([]);
-          setData([]);
-          inputReload();
-        }
-        handleLoading(false);
-      }
+      // } catch{
+      //   alertError(t('apiError'));
+      //   if(files.length) {
+      //     setFiles([]);
+      //     setData([]);
+      //     inputReload();
+      //   }
+      //   handleLoading(false);
+      // }
     } else{
       if(files.length) {
         setFiles([]);

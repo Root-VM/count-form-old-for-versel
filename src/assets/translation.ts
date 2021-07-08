@@ -35,7 +35,9 @@ export const LangStrings = {
     paid: 'successful paid!!! We will contact you soon',
     sameLng: 'please select different languages',
     vat: ' VAT',
-    incl: 'incl'
+    incl: 'incl',
+    apostille: 'with Apostille',
+    apostilleLink: ' (More here)'
   },
   de: {
     quote: 'Angebot berechnen',
@@ -73,6 +75,8 @@ export const LangStrings = {
     paid: 'erfolgreich bezahlt!!! Wir werden Sie bald kontaktieren',
     sameLng: 'Bitte wählen Sie verschiedene Sprachen aus',
     vat: ' MwSt',
-    incl: 'inkl'
+    incl: 'inkl',
+    apostille: 'mit Apostille',
+    apostilleLink: '(mehr dazu)'
   }
 };

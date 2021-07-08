@@ -2,7 +2,7 @@
 export const apiUrl = 'https://wordcount.nadlo.ch';
 
 export const filesUpload = async (data: FormData) => {
-  const response = await fetch(`${apiUrl}/words/payment`, {
+  const response = await fetch(`${apiUrl}/pages/payment`, {
     method: 'POST',
     headers: {},
     body: data
@@ -11,7 +11,7 @@ export const filesUpload = async (data: FormData) => {
 };
 
 export const fileUpload = async (data: FormData) => {
-  const response = await fetch(`${apiUrl}/words/price`, {
+  const response = await fetch(`${apiUrl}/pages/price`, {
     method: 'POST',
     headers: {},
     body: data
@@ -20,7 +20,7 @@ export const fileUpload = async (data: FormData) => {
 };
 
 export const pusrchased = async (data: FormData) => {
-  const response = await fetch(`${apiUrl}/words/purchased`, {
+  const response = await fetch(`${apiUrl}/pages/purchased`, {
     method: 'POST',
     headers: {},
     body: data

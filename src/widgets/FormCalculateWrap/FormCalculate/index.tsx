@@ -52,6 +52,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   const [checked, setChecked] = useState(false);
   const [cardError, setCardError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [apostille, setApostille] = useState(false);
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -163,6 +164,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
           }
           formData.append('translateFrom', firstStepData.lngFrom);
           formData.append('type', firstStepData.service);
+          formData.append('apostille', String(apostille));
 
           const payment = await filesUpload(formData);
 
@@ -202,7 +204,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
     <p>{t("files")}</p>
 
     <FileUpload handleChange={getFiles} lngFrom={firstStepData.lngFrom} lngTo={firstStepData.lngTo}
-                service={firstStepData.service}
+                service={firstStepData.service} apostille={apostille}
                 checkError={fistStepEmitted && !filesData.files.length} handleLoading={(e:any) => {setLoading(e)}}
                 color={secondaryColor}
     />
@@ -224,6 +226,11 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
                     onChange={(e) => {seFirstStepData({...firstStepData, date: moment(e)})}}/>
       </div>
     </div>
+
+    <Checkbox onChange={(e:any) => {setApostille(e.target.checked)}} className={css.apostille}>
+      {t('apostille')}
+      <a href="https://www.certified-translation.ch/when-is-an-apostille-required/" target="_blank">{t('apostilleLink')}</a>
+    </Checkbox>
 
     {languageData.length ?
       <div className={classNames(css.group, css.groupArrow)}>

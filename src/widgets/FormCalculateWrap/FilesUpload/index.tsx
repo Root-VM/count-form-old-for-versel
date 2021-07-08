@@ -11,11 +11,12 @@ const toMbSize = (e: number) => {
   return (e / (1024*1024)).toFixed(2);
 };
 
-const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean, lngFrom: string, lngTo: string, color: string, service: string}> = (props) => {
+const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean, lngFrom: string,
+  lngTo: string, color: string, service: string, apostille: boolean}> = (props) => {
   const [files, setFiles] = useState<any>([]);
   const [data, setData] = useState<any>([]);
   const [showInput, setShowInput] = useState(true);
-  const { handleChange, handleLoading, checkError, lngFrom, lngTo, color, service } = props;
+  const { handleChange, handleLoading, checkError, lngFrom, lngTo, color, service, apostille } = props;
   const { t } = useTranslation();
 
   const getPhoto = async (e: any) => {
@@ -38,6 +39,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
       const formData = new FormData();
       formData.append('file', files[files.length - 1]);
       formData.append('translateFrom', lngFrom);
+      formData.append('apostille', String(apostille));
       if(service === 'translation') {
         formData.append('translateTo', lngTo);
       }

@@ -214,6 +214,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
 
       } else{
         handleChange({files, price: 0, count: 0, isCertified: false});
+        handleChange({files, price: 0, count: 0, isCertified: true, handle: {}});
       }
     }
   }, [data, files, apostille]);

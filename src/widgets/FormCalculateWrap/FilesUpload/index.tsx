@@ -4,8 +4,8 @@ import { Button } from 'antd';
 
 import css from './files-upload.module.scss';
 import useTranslation from '../common/translation';
-import { fileUpload } from '../common/api';
-import { alertError } from '../common/alert';
+import { fileUpload, fileUploadPage } from '../common/api';
+import { alertError, alertErrorHTML } from '../common/alert';
 
 const toMbSize = (e: number) => {
   return (e / (1024*1024)).toFixed(2);
@@ -39,17 +39,56 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
       const formData = new FormData();
       formData.append('file', files[files.length - 1]);
       formData.append('translateFrom', lngFrom);
-      formData.append('apostille', String(apostille));
-      if(service === 'translation') {
+      if(service !== 'proofreading') {
         formData.append('translateTo', lngTo);
       }
+      formData.append('apostille', String(apostille));
       formData.append('type', service);
 
-      // try{
+
+      if(service === 'certified') {
+        let filesSize = 0;
+        for(let file of files) {
+          filesSize += file.size;
+        }
+
+        console.log(filesSize);
+        if(filesSize > 20971520) {
+          if(files.length) {
+            setFiles([]);
+            setData([]);
+            inputReload();
+          }
+          t('lng') === 'de' ? alertErrorHTML(<div>Leider ist ein Fehlerpassiert. Bitte senden Sie uns die Anfrage direkt per E-Mail an: <a id='mail' href="mailto:example@email.com">example@email.com</a> </div>) :
+            alertErrorHTML(<div>Unfortunately a mistake happened. Please send us the request directly by email to: <a id='mail' href="mailto:example@email.com">example@email.com</a> </div>);
+
+          handleLoading(false);
+          return false;
+        }
+
+        const val = await fileUploadPage(formData);
+        if(val?.pagesQuantity){
+          if(data.length < files.length) {
+            setData([...data, { price: 0, count: 0, minPrice: 0, pricePerWord: 0, tax: 0, tolerance: 0,
+              isCertified: true, certified: {
+                apostille: val.apostille, authentication: val.authentication, pagePrice: val.pagePrice,
+                pagesQuantity: val.pagesQuantity, price: val.price, shipping: val.shipping
+              }
+            }]);
+          }
+        } else{
+          alertError(t('apiError'));
+          if(files.length) {
+            setFiles([]);
+            setData([]);
+            inputReload();
+          }
+        }
+      } else{
         const val = await fileUpload(formData);
         if(val?.pricePerWord){
           if(data.length < files.length) {
-            setData([...data, { price: val.price, count: val.wordsQuantity,
+            setData([...data, { price: val.price, count: val.wordsQuantity, isCertified: false,
               minPrice: val.minPrice, pricePerWord: val.pricePerWord, tax: val.tax, tolerance: val.tolerance }]);
           }
         } else{
@@ -60,16 +99,9 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
             inputReload();
           }
         }
-        handleLoading(false);
-      // } catch{
-      //   alertError(t('apiError'));
-      //   if(files.length) {
-      //     setFiles([]);
-      //     setData([]);
-      //     inputReload();
-      //   }
-      //   handleLoading(false);
-      // }
+      }
+
+      handleLoading(false);
     } else{
       if(files.length) {
         setFiles([]);
@@ -111,30 +143,80 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
     return Number(res.toFixed(2));
   };
 
+
   useEffect(() => {
-    // let price = 0;
     if(data.length) {
-      let count = 0;
+      if(data[0].isCertified) {
+        let pages = 0;
+        let pricePerPage = 0;
+        for(let item of data) { pages += item.certified.pagesQuantity; }
 
-      for(let item of data) {
-        count += item.count;
+        if(pages <= 2 ) {
+          pricePerPage = data[0].certified.pagePrice[Object.keys(data[0].certified.pagePrice)[0]]
+        } else if (pages <= 4){
+          pricePerPage = data[0].certified.pagePrice[Object.keys(data[0].certified.pagePrice)[1]]
+        } else if (pages <= 6) {
+          pricePerPage = data[0].certified.pagePrice[Object.keys(data[0].certified.pagePrice)[2]]
+        }
+
+        const pricePerPages = pricePerPage * pages;
+        let priceBeforeTaxes = pricePerPages + data[0].certified.authentication + data[0].certified.shipping;
+        if (apostille) {
+          priceBeforeTaxes += data[0].certified.apostille;
+        }
+
+        const priceAfterTaxes = +( Math.round((priceBeforeTaxes + priceBeforeTaxes * .077) *  100) / 100
+                                  ).toFixed(2);
+        const total = transformChf(priceAfterTaxes);
+        const tax = (total - priceBeforeTaxes).toFixed(2);
+
+        const handle = {files, pages, translationPrice: pricePerPages, tax,  total,
+          certificationPrice: data[0].certified.authentication, apostille: data[0].certified.apostille,
+          shipping: data[0].certified.shipping
+        };
+        handleChange({files, price: 0, count: 0, isCertified: true, handle: handle});
+
+
+        if(pages > 6) {
+          {
+            t('lng') === 'de' ? alertErrorHTML(<div>Da der Umfang des / der Dokumente unsere Sofortbestellmöglichkeiten überschreitet, bitten wir Sie, uns eine Offertenanfrage zu senden an: <a id='mail' href="mailto:example@email.com">example@email.com</a> </div>) :
+              alertErrorHTML(<div>Since the scope of the document (s) exceeds our immediate order options, we ask you to send us an offer request to:: <a id='mail' href="mailto:example@email.com">example@email.com</a> </div>);
+            handleChange({files, price: 0, count: 0, isCertified: true, handle: {}});
+            if(files.length) {
+              setFiles([]);
+              setData([]);
+              inputReload();
+            }
+            handleLoading(false);
+          }
+        }
+      } else{
+        let count = 0;
+
+        for(let item of data) {
+          count += item.count;
+        }
+
+        const pricePerWords = data[0].pricePerWord * count;
+        let priceBeforeTaxes = pricePerWords + pricePerWords * data[0].tolerance;
+        if(priceBeforeTaxes < data[0].minPrice){
+          priceBeforeTaxes = data[0].minPrice;
+        }
+
+        const priceAfterTaxes = +(
+          Math.round((priceBeforeTaxes + priceBeforeTaxes * data[0].tax) * 100) / 100
+        ).toFixed(2);
+
+        handleChange({files, price: transformChf(priceAfterTaxes), count, isCertified: false});
       }
-
-      const pricePerWords = data[0].pricePerWord * count;
-      let priceBeforeTaxes = pricePerWords + pricePerWords * data[0].tolerance;
-      if(priceBeforeTaxes < data[0].minPrice){
-        priceBeforeTaxes = data[0].minPrice;
-      }
-
-      const priceAfterTaxes = +(
-        Math.round((priceBeforeTaxes + priceBeforeTaxes * data[0].tax) * 100) / 100
-      ).toFixed(2);
-
-      handleChange({files, price: transformChf(priceAfterTaxes), count});
     } else{
-      handleChange({files, price: 0, count: 0});
+      if(data.isCertified) {
+
+      } else{
+        handleChange({files, price: 0, count: 0, isCertified: false});
+      }
     }
-  }, [data, files]);
+  }, [data, files, apostille]);
 
   useEffect(() => {
     if(lngFrom === lngTo && service === 'translation') {

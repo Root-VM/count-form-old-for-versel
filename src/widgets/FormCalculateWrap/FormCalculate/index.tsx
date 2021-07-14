@@ -9,7 +9,7 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import css from './form-calculate.module.scss';
 import useTranslation from '../common/translation';
 import { useRouter } from 'next/router';
-import { filesUpload, getLanguages, pusrchased } from '../common/api';
+import { filesUpload, filesUploadPage, getLanguages, pusrchased, pusrchasedPage } from '../common/api';
 import { alertSuccess } from '../common/alert';
 
 const tProps = {
@@ -43,6 +43,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   });
   const [filesData, setFilesData] = useState<{files: any, price: number, count: number}>
   ({files: [], price: 0, count: 0});
+  const [certifyData, setCertifyData] = useState<any>({files: [], price: 0, count: 0, handle: {}});
   const [languageData, setLanguageData] = useState<any>([]);
   const [languageDataServer, setLanguageDataServer] = useState<any>([]);
   const [isFistStep, setFistStep] = useState(true);
@@ -57,8 +58,9 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   const router = useRouter();
 
   const subjectAreaData = [
-    {value:'translation', title: router.query?.lang !== 'de' ? 'Translation (inkl. Revision)' : 'Übersetzung (inkl. Revision)'},
+    {value:'translation', title: router.query?.lang !== 'de' ? 'Translation (incl. Revision)' : 'Übersetzung (inkl. Revision)'},
     {value:'proofreading', title: router.query?.lang !== 'de' ? 'Proofreading' : 'Korrektur'},
+    {value:'certified', title: router.query?.lang !== 'de' ? 'Certified Translation' : 'Beglaubigte Übersetzung'},
   ];
 
   const onCheckboxChange = async (e: any) => {
@@ -107,8 +109,12 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
     });
   }, [router]);
 
-  const getFiles = (e: {files: any, price: number, count: number}) => {
-    setFilesData({files: e.files, price: e.price, count: e.count});
+  const getFiles = (e: {files: any, price: number, count: number, isCertified: boolean, handle: any}) => {
+    if(e.isCertified) {
+      setCertifyData({files: e.files, price: e.price, count: e.count, handle: e.handle});
+    } else{
+      setFilesData({files: e.files, price: e.price, count: e.count});
+    }
   };
 
   const stripe = useStripe();
@@ -166,7 +172,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
           formData.append('type', firstStepData.service);
           formData.append('apostille', String(apostille));
 
-          const payment = await filesUpload(formData);
+          const payment = firstStepData.service === 'certified' ? await filesUploadPage(formData) : await filesUpload(formData);
 
           // @ts-ignore
           const stripeData = await stripe.confirmCardPayment(payment.paymentIntent,{
@@ -181,7 +187,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
           formData.append('email', values.email);
           formData.append('phone', values.phone);
 
-          await pusrchased(formData);
+          firstStepData.service === 'certified' ? await pusrchasedPage(formData) : await pusrchased(formData);
 
           alertSuccess(t('paid'));
           refresh();
@@ -227,10 +233,12 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
       </div>
     </div>
 
-    <Checkbox onChange={(e:any) => {setApostille(e.target.checked)}} className={css.apostille}>
-      {t('apostille')}
-      <a href="https://www.certified-translation.ch/when-is-an-apostille-required/" target="_blank">{t('apostilleLink')}</a>
-    </Checkbox>
+    {firstStepData.service === 'certified' &&
+      <Checkbox onChange={(e:any) => {setApostille(e.target.checked)}} className={css.apostille}>
+        {t('apostille')}
+        <a href="https://www.certified-translation.ch/when-is-an-apostille-required/" target="_blank">{t('apostilleLink')}</a>
+      </Checkbox>
+    }
 
     {languageData.length ?
       <div className={classNames(css.group, css.groupArrow)}>
@@ -242,7 +250,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
                       onChange={(e:string) => {seFirstStepData({...firstStepData, lngFrom: e})}}/>
         </div>
 
-        {firstStepData.service === 'translation' &&
+        {firstStepData.service !== 'proofreading' &&
         <>
           <span>&#8594;</span>
           <div>
@@ -334,11 +342,29 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
       </div>
 
       <div className={css.white}>
-        <div>
-          <h3>CHF {filesData.price}</h3>
-          <p>{t('incl')}. 7.7% {t('vat')}.</p>
-          <p>{t('count')}: {filesData.count}</p>
-        </div>
+        {firstStepData.service === 'certified' ?
+          <div className={css.certBlock}>
+            <p>CHF {certifyData.handle?.translationPrice ? certifyData.handle?.translationPrice : 0}
+            &nbsp;- {t('lng') === 'de' ? ' Übersetzungspreis' : ' translation price'}</p>
+            <p>CHF {certifyData.handle?.certificationPrice ? certifyData.handle?.certificationPrice : 0}
+              &nbsp;-{t('lng') === 'de' ? ' Zertifizierung' : ' certification'}</p>
+            { apostille &&
+              <p>CHF {certifyData.handle?.apostille ? certifyData.handle?.apostille : 0}
+                &nbsp;- apostille</p>
+            }
+            <p>CHF {certifyData.handle?.shipping ? certifyData.handle?.shipping : 0}
+              &nbsp;- {t('lng') === 'de' ? ' Versand' : ' shipping' }</p>
+            <p>CHF {certifyData.handle?.tax ? certifyData.handle?.tax : 0}
+              &nbsp;- {t('lng') === 'de' ? ' Steuerpreis' : ' tax price'}</p>
+
+            <h3>CHF {certifyData.handle?.total ? certifyData.handle?.total: 0}</h3>
+            <p>{t('lng') === 'de' ? 'Seitenzahl' : 'Number of pages' }: {certifyData.handle?.pages ? certifyData.handle?.pages : 0}</p>
+          </div> : <div>
+            <h3>CHF {filesData.price}</h3>
+            <p>{t('incl')}. 7.7% {t('vat')}.</p>
+            <p>{t('count')}: {filesData.count}</p>
+          </div>
+        }
 
         <div>
           <Button type="primary" onClick={submit} style={{backgroundColor: secondaryColor}}>

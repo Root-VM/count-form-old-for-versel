@@ -37,7 +37,8 @@ export const LangStrings = {
     vat: ' VAT',
     incl: 'incl',
     apostille: 'with Apostille',
-    apostilleLink: ' (More here)'
+    apostilleLink: ' (More here)',
+    lng: 'en'
   },
   de: {
     quote: 'Angebot berechnen',
@@ -77,6 +78,7 @@ export const LangStrings = {
     vat: ' MwSt',
     incl: 'inkl',
     apostille: 'mit Apostille',
-    apostilleLink: '(mehr dazu)'
+    apostilleLink: '(mehr dazu)',
+    lng: 'de'
   }
 };

@@ -2,6 +2,15 @@
 export const apiUrl = 'https://wordcount.nadlo.ch';
 
 export const filesUpload = async (data: FormData) => {
+  const response = await fetch(`${apiUrl}/words/payment`, {
+    method: 'POST',
+    headers: {},
+    body: data
+  });
+  return response.json();
+};
+
+export const filesUploadPage = async (data: FormData) => {
   const response = await fetch(`${apiUrl}/pages/payment`, {
     method: 'POST',
     headers: {},
@@ -11,7 +20,7 @@ export const filesUpload = async (data: FormData) => {
 };
 
 export const fileUpload = async (data: FormData) => {
-  const response = await fetch(`${apiUrl}/pages/price`, {
+  const response = await fetch(`${apiUrl}/words/price`, {
     method: 'POST',
     headers: {},
     body: data
@@ -19,7 +28,29 @@ export const fileUpload = async (data: FormData) => {
   return response.json();
 };
 
+export const fileUploadPage = async (data: FormData) => {
+  try {
+    const response = await fetch(`${apiUrl}/pages/price`, {
+      method: 'POST',
+      headers: {},
+      body: data
+    });
+    return response.json();
+  } catch (e) {
+    return Error('something wrong')
+  }
+};
+
 export const pusrchased = async (data: FormData) => {
+  const response = await fetch(`${apiUrl}/words/purchased`, {
+    method: 'POST',
+    headers: {},
+    body: data
+  });
+  return response.json();
+};
+
+export const pusrchasedPage = async (data: FormData) => {
   const response = await fetch(`${apiUrl}/pages/purchased`, {
     method: 'POST',
     headers: {},

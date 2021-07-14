@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from "@stripe/stripe-js";
 import { useRouter } from 'next/router';
-import { Radio } from 'antd';
 import FormCalculate from './FormCalculate';
 import css from './form-calculate-wrap.module.scss';
 
@@ -31,10 +30,10 @@ const FormCalculateWrap: FC = () => {
     getRouteProps()
   }, [router]);
 
-  const handleChange = (e: any) => {
-    router.push(`./?lang=${e.target.value}&mainColor=${router.query?.mainColor ? router.query.mainColor : 'D31F3A'}&secondaryColor=${router.query?.secondaryColor ? router.query.secondaryColor : '616d74'}`);
-    setValue(e.target.value);
-  };
+  // const handleChange = (e: any) => {
+  //   router.push(`./?lang=${e.target.value}&mainColor=${router.query?.mainColor ? router.query.mainColor : 'D31F3A'}&secondaryColor=${router.query?.secondaryColor ? router.query.secondaryColor : '616d74'}`);
+  //   setValue(e.target.value);
+  // };
   const reload = () => {
     setShow(false);
     setTimeout(() => {
@@ -44,10 +43,10 @@ const FormCalculateWrap: FC = () => {
 
   return (
     <>
-      <Radio.Group value={value} onChange={handleChange}>
-        <Radio.Button value="en">en</Radio.Button>
-        <Radio.Button value="de">de</Radio.Button>
-      </Radio.Group>
+      {/*<Radio.Group value={value} onChange={handleChange}>*/}
+        {/*<Radio.Button value="en">en</Radio.Button>*/}
+        {/*<Radio.Button value="de">de</Radio.Button>*/}
+      {/*</Radio.Group>*/}
 
       {show && <div className={css.wrap}>
         {/*

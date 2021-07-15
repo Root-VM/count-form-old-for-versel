@@ -180,7 +180,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
         if(pages > 6) {
           {
             t('lng') === 'de' ? alertErrorHTML(<div>Da der Umfang des / der Dokumente unsere Sofortbestellmöglichkeiten überschreitet, bitten wir Sie, uns eine Offertenanfrage zu senden an: <a id='mail' href="mailto:example@email.com">example@email.com</a> </div>) :
-              alertErrorHTML(<div>Since the scope of the document (s) exceeds our immediate order options, we ask you to send us an offer request to:: <a id='mail' href="mailto:example@email.com">example@email.com</a> </div>);
+              alertErrorHTML(<div>Since the scope of the document (s) exceeds our immediate order options, we ask you to send us an offer request to: <a id='mail' href="mailto:example@email.com">example@email.com</a> </div>);
             handleChange({files, price: 0, count: 0, isCertified: true, handle: {}});
             if(files.length) {
               setFiles([]);

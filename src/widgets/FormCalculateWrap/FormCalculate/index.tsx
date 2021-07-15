@@ -34,10 +34,10 @@ const cardOptions = {
 
 const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string}> = (props) => {
   const {refresh, mainColor, secondaryColor} = props;
-  const [firstStepData, seFirstStepData] = useState({
+  const [firstStepData, seFirstStepData] = useState<any>({
     lngFrom: 'en',
     lngTo: 'de',
-    service: 'translation',
+    service: undefined,
     files: '',
     date: moment().add(1,'days').set({h: 12, m: 0})
   });
@@ -207,13 +207,6 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
 
   const stepOne = <div className={css.orange} style={{backgroundColor: mainColor}}>
     <h3>{t("quote")}</h3>
-    <p>{t("files")}</p>
-
-    <FileUpload handleChange={getFiles} lngFrom={firstStepData.lngFrom} lngTo={firstStepData.lngTo}
-                service={firstStepData.service} apostille={apostille}
-                checkError={fistStepEmitted && !filesData.files.length} handleLoading={(e:any) => {setLoading(e)}}
-                color={secondaryColor}
-    />
 
     <div className={css.group}>
       <div>
@@ -222,8 +215,9 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
           // @ts-ignore */}
         { showService &&
         <TreeSelect value={firstStepData.service} treeData={subjectAreaData} {...tProps}
-                    placeholder="Please select" onChange={(e:string) => {seFirstStepData({...firstStepData, service: e})}}
+                    placeholder={t('choose')} onChange={(e:string) => {seFirstStepData({...firstStepData, service: e})}}
         />}
+        {!firstStepData.service && fistStepEmitted && <p className={css.errorT}>{t('mandatory')}</p>}
       </div>
       <span />
       <div>
@@ -233,12 +227,13 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
       </div>
     </div>
 
-    {firstStepData.service === 'certified' &&
-      <Checkbox onChange={(e:any) => {setApostille(e.target.checked)}} className={css.apostille}>
-        {t('apostille')}
-        <a href="https://www.certified-translation.ch/when-is-an-apostille-required/" target="_blank">{t('apostilleLink')}</a>
-      </Checkbox>
-    }
+    <p>{t("files")}</p>
+
+    <FileUpload handleChange={getFiles} lngFrom={firstStepData.lngFrom} lngTo={firstStepData.lngTo}
+                service={firstStepData.service} apostille={apostille}
+                checkError={fistStepEmitted && !filesData.files.length} handleLoading={(e:any) => {setLoading(e)}}
+                color={secondaryColor}
+    />
 
     {languageData.length ?
       <div className={classNames(css.group, css.groupArrow)}>
@@ -263,6 +258,13 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
         </>
         }
       </div> : ''
+    }
+
+    {firstStepData.service === 'certified' &&
+    <Checkbox onChange={(e:any) => {setApostille(e.target.checked)}} className={css.apostille}>
+      {t('apostille')}
+      (<a href="https://www.certified-translation.ch/when-is-an-apostille-required/" target="_blank">{t('apostilleLink')}</a>)
+    </Checkbox>
     }
   </div>;
 
@@ -343,19 +345,24 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
 
       <div className={css.white}>
         {firstStepData.service === 'certified' ?
-          <div className={css.certBlock}>
-            <p>CHF {certifyData.handle?.translationPrice ? certifyData.handle?.translationPrice : 0}
-            &nbsp;- {t('lng') === 'de' ? ' Übersetzungspreis' : ' translation price'}</p>
-            <p>CHF {certifyData.handle?.certificationPrice ? certifyData.handle?.certificationPrice : 0}
-              &nbsp;-{t('lng') === 'de' ? ' Zertifizierung' : ' certification'}</p>
+          <div className={classNames(css.certBlock, certifyData.handle?.total && css.activePrice)}>
+            <p>CHF
+              <span>{certifyData.handle?.translationPrice ? certifyData.handle?.translationPrice : 0}</span>
+            - <span>{t('trPrice')}</span></p>
+            <p>CHF
+              <span>{certifyData.handle?.certificationPrice ? certifyData.handle?.certificationPrice : 0}</span>
+            -<span>{t('certification')}</span></p>
             { apostille &&
-              <p>CHF {certifyData.handle?.apostille ? certifyData.handle?.apostille : 0}
-                &nbsp;- apostille</p>
+              <p>CHF
+                <span>{certifyData.handle?.apostille ? certifyData.handle?.apostille : 0}</span>
+              - <span>{t('lng') === 'de' ? 'Apostille' : 'apostille'}</span></p>
             }
-            <p>CHF {certifyData.handle?.shipping ? certifyData.handle?.shipping : 0}
-              &nbsp;- {t('lng') === 'de' ? ' Versand' : ' shipping' }</p>
-            <p>CHF {certifyData.handle?.tax ? certifyData.handle?.tax : 0}
-              &nbsp;- {t('lng') === 'de' ? ' Steuerpreis' : ' tax price'}</p>
+            <p>CHF
+              <span>{certifyData.handle?.shipping ? certifyData.handle?.shipping : 0}</span>
+              - <span>{t('shipping')}</span></p>
+            <p>CHF
+              <span>{certifyData.handle?.tax ? certifyData.handle?.tax : 0}</span>
+              - <span>{t('tax')}</span></p>
 
             <h3>CHF {certifyData.handle?.total ? certifyData.handle?.total: 0}</h3>
             <p>{t('lng') === 'de' ? 'Seitenzahl' : 'Number of pages' }: {certifyData.handle?.pages ? certifyData.handle?.pages : 0}</p>

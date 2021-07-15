@@ -17,6 +17,16 @@
       color: white;
     }
   }
+  .greyWrap{
+    position: absolute;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.1);
+    top: -32px;
+    height: calc(100% + 44px);
+    left: -5px;
+    width: calc(100% + 10px);
+    cursor: not-allowed;
+  }
   .files{
     box-shadow: 2px 2px 16px 0 rgb(0 0 0 / 15%);
     width: 100%;
@@ -90,6 +100,7 @@
   border-bottom: 1px solid #eb5757;
   position: relative;
   padding-left: 20px;
+  margin-bottom: -7px;
   &:before{
     content: '';
     background-image: url('/static/img/error.png');

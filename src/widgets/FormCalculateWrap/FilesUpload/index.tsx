@@ -16,6 +16,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
   const [files, setFiles] = useState<any>([]);
   const [data, setData] = useState<any>([]);
   const [showInput, setShowInput] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { handleChange, handleLoading, checkError, lngFrom, lngTo, color, service, apostille } = props;
   const { t } = useTranslation();
 
@@ -36,6 +37,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
   const apiCalculate = async () => {
     if(files.length) {
       handleLoading(true);
+      setLoading(true);
       const formData = new FormData();
       formData.append('file', files[files.length - 1]);
       formData.append('translateFrom', lngFrom);
@@ -52,7 +54,6 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
           filesSize += file.size;
         }
 
-        console.log(filesSize);
         if(filesSize > 20971520) {
           if(files.length) {
             setFiles([]);
@@ -63,6 +64,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
             alertErrorHTML(<div>Unfortunately a mistake happened. Please send us the request directly by email to: <a id='mail' href="mailto:example@email.com">example@email.com</a> </div>);
 
           handleLoading(false);
+          setLoading(false);
           return false;
         }
 
@@ -102,6 +104,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
       }
 
       handleLoading(false);
+      setLoading(false);
     } else{
       if(files.length) {
         setFiles([]);
@@ -170,9 +173,10 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
         const total = transformChf(priceAfterTaxes);
         const tax = (total - priceBeforeTaxes).toFixed(2);
 
-        const handle = {files, pages, translationPrice: pricePerPages, tax,  total,
-          certificationPrice: data[0].certified.authentication, apostille: data[0].certified.apostille,
-          shipping: data[0].certified.shipping
+        const handle = {files, pages, translationPrice: pricePerPages.toFixed(2), tax: tax,  total,
+          certificationPrice: data[0].certified.authentication.toFixed(2),
+          apostille: data[0].certified.apostille.toFixed(2),
+          shipping: data[0].certified.shipping.toFixed(2)
         };
         handleChange({files, price: 0, count: 0, isCertified: true, handle: handle});
 
@@ -188,6 +192,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
               inputReload();
             }
             handleLoading(false);
+            setLoading(false);
           }
         }
       } else{
@@ -263,7 +268,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
           <div className={css.elements}>
             {files.map((data: File, i: number) => (
               <p key={i}>
-                <img src="/static/img/close-black.svg" alt="close" onClick={() => {remove(data.name)}}/>
+                <img src="/static/img/close-black.svg" alt="close" onClick={() => {!loading && remove(data.name)}}/>
                 <span>{data.name}  ({toMbSize(data.size)} MB)</span>
               </p>
             ))}
@@ -280,7 +285,7 @@ const FileUpload: FC<{handleChange: any, handleLoading: any, checkError: boolean
         </>
       }
 
-
+      {!service && <div className={css.greyWrap} />}
     </div>
 
   );

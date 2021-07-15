@@ -1,5 +1,6 @@
 export const LangStrings = {
   en: {
+    lng: 'en',
     quote: 'Calculate quote',
     files: 'Files',
     selectFiles: 'Select file(s)',
@@ -36,11 +37,16 @@ export const LangStrings = {
     sameLng: 'please select different languages',
     vat: ' VAT',
     incl: 'incl',
-    apostille: 'with Apostille',
-    apostilleLink: ' (More here)',
-    lng: 'en'
+    apostille: 'with Apostille ',
+    apostilleLink: 'More here',
+    choose: 'Choose service',
+    trPrice: 'translation price',
+    certification: 'certification',
+    shipping: 'shipping',
+    tax: 'tax (7.7%)'
   },
   de: {
+    lng: 'de',
     quote: 'Angebot berechnen',
     files: 'Dateien',
     selectFiles: 'Dateien auswählen',
@@ -77,8 +83,12 @@ export const LangStrings = {
     sameLng: 'Bitte wählen Sie verschiedene Sprachen aus',
     vat: ' MwSt',
     incl: 'inkl',
-    apostille: 'mit Apostille',
-    apostilleLink: '(mehr dazu)',
-    lng: 'de'
+    apostille: 'mit Apostille ',
+    apostilleLink: 'mehr dazu',
+    choose: 'Dienstleistung wählen',
+    trPrice: 'Übersetzungspreis',
+    certification: 'Zertifizierung',
+    shipping: 'Versand',
+    tax:'MwSt. (7.7%)'
   }
 };

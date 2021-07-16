@@ -22,7 +22,7 @@ export const LangStrings = {
     credit: 'Credit card',
     card: 'Card number',
     accept: 'I accept',
-    term: ' Terms & Conditions',
+    term: ' the Terms & Conditions',
     mandatory: 'This is a mandatory field',
     emailError: 'E-mail is invalid',
     selectFilesError: 'please select file(s) to translate',

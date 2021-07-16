@@ -58,9 +58,9 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
   const router = useRouter();
 
   const subjectAreaData = [
-    {value:'translation', title: router.query?.lang !== 'de' ? 'Translation (incl. Revision)' : 'Übersetzung (inkl. Revision)'},
+    {value:'translation', title: router.query?.lang !== 'de' ? 'Translation (incl. revision)' : 'Übersetzung (inkl. Revision)'},
     {value:'proofreading', title: router.query?.lang !== 'de' ? 'Proofreading' : 'Korrektur'},
-    {value:'certified', title: router.query?.lang !== 'de' ? 'Certified Translation' : 'Beglaubigte Übersetzung'},
+    {value:'certified', title: router.query?.lang !== 'de' ? 'Certified translation' : 'Beglaubigte Übersetzung'},
   ];
 
   const onCheckboxChange = async (e: any) => {
@@ -355,7 +355,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
             { apostille &&
               <p>CHF
                 <span>{certifyData.handle?.apostille ? certifyData.handle?.apostille : 0}</span>
-              - <span>{t('lng') === 'de' ? 'Apostille' : 'apostille'}</span></p>
+              - <span>{t('lng') === 'de' ? 'Apostille' : 'Apostille'}</span></p>
             }
             <p>CHF
               <span>{certifyData.handle?.shipping ? certifyData.handle?.shipping : 0}</span>
@@ -365,7 +365,7 @@ const FormCalculate: FC<{refresh: any, mainColor: string, secondaryColor: string
               - <span>{t('tax')}</span></p>
 
             <h3>CHF {certifyData.handle?.total ? certifyData.handle?.total: 0}</h3>
-            <p>{t('lng') === 'de' ? 'Seitenzahl' : 'Number of pages' }: {certifyData.handle?.pages ? certifyData.handle?.pages : 0}</p>
+            <p>{t('lng') === 'de' ? 'Seitenzahl' : 'Total pages' }: {certifyData.handle?.pages ? certifyData.handle?.pages : 0}</p>
           </div> : <div>
             <h3>CHF {filesData.price}</h3>
             <p>{t('incl')}. 7.7% {t('vat')}.</p>

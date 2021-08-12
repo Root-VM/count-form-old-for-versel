@@ -79,7 +79,7 @@ export const LangStrings = {
     wordPrice: 'Preis pro Wort',
     count: 'Wörter zählen',
     apiError: 'Api-Fehler, versuchen Sie, eine andere Datei zu verwenden',
-    paid: 'erfolgreich bezahlt!!! Wir werden Sie bald kontaktieren',
+    paid: 'Erfolgreich bezahlt! Wir werden Sie bald kontaktieren',
     sameLng: 'Bitte wählen Sie verschiedene Sprachen aus',
     vat: ' MwSt',
     incl: 'Inkl',
